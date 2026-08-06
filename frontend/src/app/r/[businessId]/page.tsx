@@ -31,20 +31,15 @@ export default function CustomerQRReviewPage() {
   const [selectedLanguage, setSelectedLanguage] = useState<string>('English');
   const [selectedTone, setSelectedTone] = useState<string>('Enthusiastic');
 
-  // Exact Google Review Direct Action Link for Umiya Traders
-  const UMIYA_DIRECT_LINK = 'https://www.google.com/maps/place/Umiya+traders/@23.8500156,72.1210274,17z/data=!4m15!1m8!3m7!1s0x395c870e52c628c7:0xc460ce380999c40d!2sUmiya+traders!8m2!3d23.8500156!4d72.1210274!10e1!16s%2Fg%2F11ptz85sym!3m5!1s0x395c870e52c628c7:0xc460ce380999c40d!8m2!3d23.8500156!4d72.1210274!16s%2Fg%2F11ptz85sym?entry=ttu&action=write-review';
+  // Exact Clean Google Maps Link for Umiya Traders
+  const UMIYA_CLEAN_LINK = 'https://www.google.com/maps/place/Umiya+traders/@23.8500156,72.1210274,17z/data=!4m15!1m8!3m7!1s0x395c870e52c628c7:0xc460ce380999c40d!2sUmiya+traders!8m2!3d23.8500156!4d72.1210274!10e1!16s%2Fg%2F11ptz85sym!3m5!1s0x395c870e52c628c7:0xc460ce380999c40d!8m2!3d23.8500156!4d72.1210274!16s%2Fg%2F11ptz85sym';
 
-  const [googleReviewUrl, setGoogleReviewUrl] = useState<string>(UMIYA_DIRECT_LINK);
+  const [googleReviewUrl, setGoogleReviewUrl] = useState<string>(UMIYA_CLEAN_LINK);
 
-  // Helper to ensure URL triggers Google's Direct Review Popup
-  const getDirectReviewUrl = (rawUrl: string) => {
+  const getCleanUrl = (rawUrl: string) => {
     let url = rawUrl.trim();
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
       url = `https://${url}`;
-    }
-    // If it's a standard google maps place link and missing action=write-review, append it
-    if (url.includes('google.com/maps') && !url.includes('action=write-review')) {
-      url += url.includes('?') ? '&action=write-review' : '?action=write-review';
     }
     return url;
   };
@@ -52,10 +47,11 @@ export default function CustomerQRReviewPage() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedUrl = localStorage.getItem('google_review_url');
-      if (savedUrl) {
-        setGoogleReviewUrl(getDirectReviewUrl(savedUrl));
+      if (savedUrl && !savedUrl.includes('action=write-review')) {
+        setGoogleReviewUrl(getCleanUrl(savedUrl));
       } else {
-        localStorage.setItem('google_review_url', UMIYA_DIRECT_LINK);
+        localStorage.setItem('google_review_url', UMIYA_CLEAN_LINK);
+        setGoogleReviewUrl(UMIYA_CLEAN_LINK);
       }
 
       const savedName = localStorage.getItem('business_name');
@@ -133,10 +129,10 @@ export default function CustomerQRReviewPage() {
     // 2. Show floating action guidance bar
     setShowFloatingActionBar(true);
 
-    // 3. Format URL with Google's direct review trigger
-    const targetUrl = getDirectReviewUrl(googleReviewUrl);
+    // 3. Format clean URL
+    const targetUrl = getCleanUrl(googleReviewUrl);
 
-    // 4. Open direct review popup link in new tab
+    // 4. Open Google Maps link in new tab
     window.open(targetUrl, '_blank');
   };
 
@@ -341,7 +337,7 @@ export default function CustomerQRReviewPage() {
         <div className="fixed bottom-6 right-6 z-50 max-w-sm w-full card-stripe-glow rounded-3xl p-5 border border-emerald-500/40 shadow-2xl space-y-3 animate-in slide-in-from-bottom duration-300">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
-              <Check className="w-4 h-4" /> Review Copied! Direct Popup Opened
+              <Check className="w-4 h-4" /> Review Copied! Umiya Traders Page Opened
             </span>
             <button
               onClick={() => setShowFloatingActionBar(false)}
