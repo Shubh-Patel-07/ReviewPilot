@@ -253,14 +253,40 @@ export default function QRCodeGeneratorPage() {
       // Bottom-right
       ctx.beginPath(); ctx.moveTo(W - 30, H - 80); ctx.lineTo(W - 30, H - 30); ctx.lineTo(W - 80, H - 30); ctx.stroke();
 
-      // ── DOWNLOAD ──
+      // ── DOWNLOAD HANDLING ──
       const dataUrl = canvas.toDataURL('image/png', 1.0);
-      const a = document.createElement('a');
-      a.href = dataUrl;
-      a.download = `${bName}_QR_Poster.${format === 'pdf' ? 'png' : 'png'}`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+
+      if (format === 'pdf') {
+        // Native Print / Save to PDF Generator
+        const printWindow = window.open('', '_blank');
+        if (printWindow) {
+          printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <title>${bName} - Print Ready QR Poster</title>
+                <style>
+                  @page { size: A5 portrait; margin: 0; }
+                  body { margin: 0; padding: 0; display: flex; align-items: center; justify-content: center; background: #0F172A; min-height: 100vh; }
+                  img { width: 100%; height: 100vh; object-fit: contain; }
+                </style>
+              </head>
+              <body>
+                <img src="${dataUrl}" onload="setTimeout(function(){ window.print(); }, 300);" />
+              </body>
+            </html>
+          `);
+          printWindow.document.close();
+        }
+      } else {
+        // PNG download
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = `${bName}_QR_Poster.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
     };
     qrImg.src = svgDataUrl;
   };
