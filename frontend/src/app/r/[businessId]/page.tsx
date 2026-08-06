@@ -141,7 +141,6 @@ export default function CustomerQRReviewPage() {
         const bd = pickRandom(bodyDetails);
         const ed = pickRandom(endings);
 
-        // Mix sentence count randomly (Sometimes 2 sentences, sometimes 3 sentences)
         const formatStyle = Math.floor(Math.random() * 3);
         if (formatStyle === 0) {
           draft = `${op} ${bd}`;
@@ -163,15 +162,37 @@ export default function CustomerQRReviewPage() {
     generateUniqueReview();
   }, [rating, businessName, selectedTone]);
 
+  // Safe Clipboard Copy Helper for Mobile & Desktop (HTTP & HTTPS)
+  const safeCopyToClipboard = (text: string) => {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text);
+      } else {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand('copy');
+        textArea.remove();
+      }
+    } catch (err) {
+      console.log('Mobile clipboard copy handled safely:', err);
+    }
+  };
+
   const handleCopy = () => {
-    navigator.clipboard.writeText(aiDraft);
+    safeCopyToClipboard(aiDraft);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handleOpenGoogle = () => {
-    // 1. Auto-copy AI review draft to clipboard
-    navigator.clipboard.writeText(aiDraft);
+    // 1. Safe Auto-copy AI review draft to clipboard without errors
+    safeCopyToClipboard(aiDraft);
     setCopied(true);
 
     // 2. Show floating action guidance bar
