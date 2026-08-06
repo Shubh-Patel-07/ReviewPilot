@@ -13,6 +13,8 @@ import {
   ShieldCheck,
   Building2,
   CheckCircle2,
+  Info,
+  X,
 } from 'lucide-react';
 
 export default function CustomerQRReviewPage() {
@@ -26,6 +28,7 @@ export default function CustomerQRReviewPage() {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
+  const [showGuideModal, setShowGuideModal] = useState<boolean>(false);
   const [selectedLanguage, setSelectedLanguage] = useState<string>('English');
   const [selectedTone, setSelectedTone] = useState<string>('Enthusiastic');
 
@@ -108,14 +111,18 @@ export default function CustomerQRReviewPage() {
   const handleOpenGoogle = () => {
     // 1. Copy AI review draft to clipboard
     navigator.clipboard.writeText(aiDraft);
+    setCopied(true);
 
-    // 2. Format URL cleanly with http/https prefix
+    // 2. Show guidance popup
+    setShowGuideModal(true);
+
+    // 3. Format URL cleanly with http/https prefix
     let targetUrl = googleReviewUrl.trim();
     if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
       targetUrl = `https://${targetUrl}`;
     }
 
-    // 3. Open business's exact Google Review link in new tab
+    // 4. Open business's exact Google Review link in new tab
     window.open(targetUrl, '_blank');
   };
 
@@ -321,7 +328,7 @@ export default function CustomerQRReviewPage() {
                 onChange={(e) => {
                   setGoogleReviewUrl(e.target.value);
                   if (typeof window !== 'undefined') {
-                    localStorage.setItem('google_review_url', e.target.value);
+                    localStorage.getItem('google_review_url');
                   }
                 }}
                 placeholder="https://g.page/r/your-link"
@@ -331,6 +338,50 @@ export default function CustomerQRReviewPage() {
           </div>
         )}
       </main>
+
+      {/* Guidance Modal Popup when opening Google */}
+      {showGuideModal && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="card-stripe-glow w-full max-w-sm rounded-3xl p-6 space-y-4 border border-blue-500/40 relative animate-in fade-in zoom-in">
+            <button
+              onClick={() => setShowGuideModal(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-white"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider">
+              <Check className="w-4 h-4" /> Review Copied to Clipboard!
+            </div>
+
+            <h3 className="text-lg font-extrabold text-white">How to Post on Google in 2 Taps:</h3>
+
+            <div className="space-y-3 text-xs text-slate-300">
+              <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-950/80 border border-slate-800">
+                <span className="w-6 h-6 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center shrink-0 text-xs">1</span>
+                <p>On Google's popup screen, tap on <strong>5 Stars ⭐⭐⭐⭐⭐</strong></p>
+              </div>
+
+              <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-950/80 border border-slate-800">
+                <span className="w-6 h-6 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center shrink-0 text-xs">2</span>
+                <p>Click inside the text box and press <strong>Ctrl + V</strong> (or Long Press &rarr; Paste)</p>
+              </div>
+
+              <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-950/80 border border-slate-800">
+                <span className="w-6 h-6 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center shrink-0 text-xs">3</span>
+                <p>Click <strong>"Post"</strong> to publish your review!</p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowGuideModal(false)}
+              className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold"
+            >
+              Got It!
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Footer Disclaimer */}
       <footer className="w-full max-w-md text-center py-4 text-[11px] text-slate-500 z-10">
