@@ -13,8 +13,9 @@ import {
   ShieldCheck,
   Building2,
   CheckCircle2,
-  Info,
   X,
+  Zap,
+  MousePointerClick,
 } from 'lucide-react';
 
 export default function CustomerQRReviewPage() {
@@ -28,7 +29,7 @@ export default function CustomerQRReviewPage() {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
-  const [showGuideModal, setShowGuideModal] = useState<boolean>(false);
+  const [showFloatingActionBar, setShowFloatingActionBar] = useState<boolean>(false);
   const [selectedLanguage, setSelectedLanguage] = useState<string>('English');
   const [selectedTone, setSelectedTone] = useState<string>('Enthusiastic');
 
@@ -109,12 +110,12 @@ export default function CustomerQRReviewPage() {
   };
 
   const handleOpenGoogle = () => {
-    // 1. Copy AI review draft to clipboard
+    // 1. Auto-copy AI review draft to clipboard
     navigator.clipboard.writeText(aiDraft);
     setCopied(true);
 
-    // 2. Show guidance popup
-    setShowGuideModal(true);
+    // 2. Show floating action guidance bar
+    setShowFloatingActionBar(true);
 
     // 3. Format URL cleanly with http/https prefix
     let targetUrl = googleReviewUrl.trim();
@@ -318,67 +319,41 @@ export default function CustomerQRReviewPage() {
                 Post on Google <ExternalLink className="w-3.5 h-3.5" />
               </button>
             </div>
-
-            {/* Editable Business Google Link Helper */}
-            <div className="pt-2 border-t border-slate-800/60 flex items-center justify-between text-[11px] text-slate-400">
-              <span>Target Link:</span>
-              <input
-                type="text"
-                value={googleReviewUrl}
-                onChange={(e) => {
-                  setGoogleReviewUrl(e.target.value);
-                  if (typeof window !== 'undefined') {
-                    localStorage.getItem('google_review_url');
-                  }
-                }}
-                placeholder="https://g.page/r/your-link"
-                className="bg-slate-950 border border-slate-800 text-blue-400 text-[11px] rounded-lg px-2 py-1 w-3/4 truncate focus:outline-none focus:ring-1 focus:ring-blue-600"
-              />
-            </div>
           </div>
         )}
       </main>
 
-      {/* Guidance Modal Popup when opening Google */}
-      {showGuideModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="card-stripe-glow w-full max-w-sm rounded-3xl p-6 space-y-4 border border-blue-500/40 relative animate-in fade-in zoom-in">
+      {/* Floating Action Guidance Bar on Bottom Right */}
+      {showFloatingActionBar && (
+        <div className="fixed bottom-6 right-6 z-50 max-w-sm w-full card-stripe-glow rounded-3xl p-5 border border-emerald-500/40 shadow-2xl space-y-3 animate-in slide-in-from-bottom duration-300">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+              <Check className="w-4 h-4" /> Review Copied! Ready to Paste
+            </span>
             <button
-              onClick={() => setShowGuideModal(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white"
+              onClick={() => setShowFloatingActionBar(false)}
+              className="text-slate-400 hover:text-white"
             >
               <X className="w-4 h-4" />
             </button>
+          </div>
 
-            <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider">
-              <Check className="w-4 h-4" /> Review Copied to Clipboard!
+          <div className="p-3 rounded-2xl bg-slate-950/90 border border-slate-800 text-xs space-y-2">
+            <div className="flex items-center justify-between text-[11px] text-slate-400">
+              <span>On Google's Popup Screen:</span>
+              <span className="text-amber-400 font-bold">⭐ Tap 5th Star</span>
             </div>
-
-            <h3 className="text-lg font-extrabold text-white">How to Post on Google in 2 Taps:</h3>
-
-            <div className="space-y-3 text-xs text-slate-300">
-              <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-950/80 border border-slate-800">
-                <span className="w-6 h-6 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center shrink-0 text-xs">1</span>
-                <p>On Google's popup screen, tap on <strong>5 Stars ⭐⭐⭐⭐⭐</strong></p>
-              </div>
-
-              <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-950/80 border border-slate-800">
-                <span className="w-6 h-6 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center shrink-0 text-xs">2</span>
-                <p>Click inside the text box and press <strong>Ctrl + V</strong> (or Long Press &rarr; Paste)</p>
-              </div>
-
-              <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-950/80 border border-slate-800">
-                <span className="w-6 h-6 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center shrink-0 text-xs">3</span>
-                <p>Click <strong>"Post"</strong> to publish your review!</p>
-              </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleCopy}
+                className="w-full py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
+              >
+                <Copy className="w-3.5 h-3.5" /> {copied ? 'Copied!' : 'Click to Recopy Text'}
+              </button>
             </div>
-
-            <button
-              onClick={() => setShowGuideModal(false)}
-              className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold"
-            >
-              Got It!
-            </button>
+            <p className="text-[10px] text-slate-400 text-center">
+              Then click inside Google's text box & press <strong>Ctrl + V (Paste)</strong>!
+            </p>
           </div>
         </div>
       )}
