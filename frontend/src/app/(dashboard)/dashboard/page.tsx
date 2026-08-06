@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { QRCodeSVG } from 'qrcode.react';
 import {
   QrCode,
   MessageSquare,
@@ -202,10 +203,14 @@ export default function DashboardOverviewPage() {
 
             <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col items-center justify-center text-center space-y-3">
               <div className="w-32 h-32 bg-white p-2 rounded-xl shadow-lg border-2 border-blue-600 flex items-center justify-center">
-                <div className="w-full h-full border border-slate-900 border-dashed flex flex-col items-center justify-center text-slate-900 font-extrabold text-[10px]">
-                  <span>[ QR CODE ]</span>
-                  <span className="text-[8px] text-slate-600">Aroma Roastery</span>
-                </div>
+                <QRCodeSVG
+                  value="http://localhost:3000/r/umiya-traders"
+                  size={112}
+                  bgColor="#FFFFFF"
+                  fgColor="#0F172A"
+                  level="H"
+                  includeMargin={false}
+                />
               </div>
               <p className="text-xs font-bold text-white">Main Entrance Counter QR</p>
               <p className="text-[11px] text-slate-400">Target: Google Review Link</p>
