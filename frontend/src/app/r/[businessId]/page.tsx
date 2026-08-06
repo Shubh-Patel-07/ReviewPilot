@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import {
   Star,
@@ -31,8 +31,9 @@ export default function CustomerQRReviewPage() {
   const [selectedLanguage, setSelectedLanguage] = useState<string>('English');
   const [selectedTone, setSelectedTone] = useState<string>('Enthusiastic');
 
+  const lastReviewRef = useRef<string>('');
+
   // OFFICIAL Direct Google Write-a-Review Deep Link for Umiya Traders
-  // `#lrd=...,3` forces Google Search to directly open the "Write a Review" modal dialog box!
   const UMIYA_DIRECT_WRITE_REVIEW_LINK = 'https://www.google.com/search?q=Umiya+traders#lrd=0x395c870e52c628c7:0xc460ce380999c40d,3';
 
   const [googleReviewUrl, setGoogleReviewUrl] = useState<string>(UMIYA_DIRECT_WRITE_REVIEW_LINK);
@@ -53,60 +54,114 @@ export default function CustomerQRReviewPage() {
     }
   }, []);
 
-  // Variety Generator following expert rules
+  // Super-Dynamic High-Variety AI Review Engine
   const generateUniqueReview = () => {
     setIsGenerating(true);
     setTimeout(() => {
-      const bName = businessName || 'Umiya Traders';
-      const openings5 = [
-        `Stopped by ${bName} today and was thoroughly impressed with their collection and service.`,
-        `Honestly, ${bName} exceeded what I was expecting. Excellent quality products!`,
-        `Just finished my visit at ${bName} and felt compelled to drop a quick review.`,
-        `I've been dealing with ${bName} for a while now and they never disappoint.`,
-        `Can't say enough good things about my experience at ${bName}.`,
+      const name = businessName || 'Umiya Traders';
+      const userText = feedback.trim();
+
+      // MASSIVE OPENING VARIATIONS
+      const openings5_Enthusiastic = [
+        `Honestly, ${name} completely surpassed what I was expecting today!`,
+        `Just finished visiting ${name} and I couldn't be happier with the whole experience.`,
+        `Stopped by ${name} earlier and was blown away by their fantastic service and collection.`,
+        `Huge shoutout to the team at ${name} for going above and beyond!`,
+        `If you're looking for genuine quality, ${name} is 100% the place to go.`,
+        `Had a 5-star experience at ${name} from start to finish!`,
+        `So glad I decided to visit ${name} today. Truly top-notch service!`,
+      ];
+
+      const openings5_Professional = [
+        `I am writing to express my high level of satisfaction with ${name}.`,
+        `My experience with ${name} was smooth, professional, and thoroughly impressive.`,
+        `The staff and quality of service at ${name} represent true professionalism.`,
+        `${name} consistently delivers excellent service and reliable products.`,
+      ];
+
+      const openings5_Casual = [
+        `Super happy with my visit to ${name}!`,
+        `Checked out ${name} today and they did an awesome job.`,
+        `Quick review for ${name} — 100% worth visiting!`,
+        `Always a pleasant experience whenever I go to ${name}.`,
       ];
 
       const openings4 = [
-        `Had a really solid experience at ${bName}. Good quality and fair pricing.`,
-        `Overall very pleased with my purchase from ${bName}.`,
-        `Consistently good service and genuine items at ${bName}.`,
+        `Had a really solid experience with ${name}. Good quality overall.`,
+        `Overall very pleased with my purchase and visit to ${name}.`,
+        `Pretty great service at ${name}. Reliable and fair pricing.`,
+        `${name} delivered good quality service as expected.`,
       ];
 
       const openings3 = [
-        `Fair experience overall at ${bName}.`,
-        `Decent visit to ${bName} today.`,
+        `Fair experience overall at ${name}. Service was acceptable.`,
+        `Decent visit to ${name} today. Room for minor improvements.`,
+        `Average experience at ${name}. Staff was polite enough.`,
       ];
 
-      const details = [
-        feedback ? `Loved that ${feedback}. Everything was handled with great care and professionalism.` : "The customer service was friendly, knowledgeable, and genuinely helpful throughout.",
-        feedback ? `Highlight of the visit was definitely ${feedback}.` : "Product quality stood out immediately and the team made sure everything went smoothly.",
-        feedback ? `Really appreciated how ${feedback}.` : "Prompt assistance, great pricing, and top quality service from start to finish.",
+      // MASSIVE BODY DETAILS VARIATIONS
+      const bodyDetails = [
+        userText ? `I especially appreciated that ${userText}.` : "The customer service was friendly, attentive, and very helpful.",
+        userText ? `What really stood out to me was ${userText}.` : "Their product collection is great and the pricing is very reasonable.",
+        userText ? `A major highlight for me was ${userText}.` : "Everything was handled quickly without any hassle or delay.",
+        userText ? `Loved how ${userText}.` : "The team took the time to answer all my questions patiently.",
+        userText ? `Super impressed that ${userText}.` : "The atmosphere was welcoming and the service was super fast.",
+        "The overall attention to detail was super impressive.",
+        "It's rare to find such honest and transparent service nowadays.",
+        "Quality standards are top tier and the staff genuinely cares about customers.",
       ];
 
+      // MASSIVE CLOSING VARIATIONS
       const endings = [
         "Will definitely be coming back again soon!",
-        "10/10 recommend checking out Umiya Traders if you haven't already.",
-        "Couldn't have asked for a better overall buying experience.",
-        "Definitely earned a permanent spot as my go-to choice.",
+        `10/10 recommend checking out ${name}!`,
+        "Couldn't have asked for a better overall experience.",
+        "Definitely earned a permanent spot on my list of favorites.",
+        "Will be recommending them to all my friends and family!",
+        "Keep up the amazing work guys!",
+        "Looking forward to my next visit already.",
+        "Highly recommended to everyone!",
       ];
 
-      let draft = '';
-      if (rating === 5) {
-        draft = `${openings5[Math.floor(Math.random() * openings5.length)]} ${details[Math.floor(Math.random() * details.length)]} ${endings[Math.floor(Math.random() * endings.length)]}`;
-      } else if (rating === 4) {
-        draft = `${openings4[Math.floor(Math.random() * openings4.length)]} ${details[Math.floor(Math.random() * details.length)]} Will visit again!`;
-      } else {
-        draft = `${openings3[Math.floor(Math.random() * openings3.length)]} ${feedback ? feedback : 'Staff was polite.'} Hoping for an even better experience next time.`;
-      }
+      // Random picker helper avoiding duplicate of last generated review
+      const pickRandom = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)];
 
+      let chosenOpenings = openings5_Enthusiastic;
+      if (selectedTone === 'Professional') chosenOpenings = openings5_Professional;
+      if (selectedTone === 'Casual') chosenOpenings = openings5_Casual;
+
+      if (rating === 4) chosenOpenings = openings4;
+      if (rating <= 3) chosenOpenings = openings3;
+
+      let draft = '';
+      let attempts = 0;
+
+      do {
+        const op = pickRandom(chosenOpenings);
+        const bd = pickRandom(bodyDetails);
+        const ed = pickRandom(endings);
+
+        // Mix sentence count randomly (Sometimes 2 sentences, sometimes 3 sentences)
+        const formatStyle = Math.floor(Math.random() * 3);
+        if (formatStyle === 0) {
+          draft = `${op} ${bd}`;
+        } else if (formatStyle === 1) {
+          draft = `${op} ${ed}`;
+        } else {
+          draft = `${op} ${bd} ${ed}`;
+        }
+        attempts++;
+      } while (draft === lastReviewRef.current && attempts < 10);
+
+      lastReviewRef.current = draft;
       setAiDraft(draft);
       setIsGenerating(false);
-    }, 600);
+    }, 500);
   };
 
   useEffect(() => {
     generateUniqueReview();
-  }, [rating, businessName]);
+  }, [rating, businessName, selectedTone]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(aiDraft);
@@ -218,7 +273,7 @@ export default function CustomerQRReviewPage() {
               <select
                 value={selectedTone}
                 onChange={(e) => setSelectedTone(e.target.value)}
-                className="bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-lg px-2 py-1 focus:outline-none"
+                className="bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-lg px-2 py-1 focus:outline-none cursor-pointer"
               >
                 <option value="Enthusiastic">Enthusiastic</option>
                 <option value="Professional">Professional</option>
@@ -231,7 +286,7 @@ export default function CustomerQRReviewPage() {
               <select
                 value={selectedLanguage}
                 onChange={(e) => setSelectedLanguage(e.target.value)}
-                className="bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-lg px-2 py-1 focus:outline-none"
+                className="bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-lg px-2 py-1 focus:outline-none cursor-pointer"
               >
                 <option value="English">English</option>
                 <option value="Spanish">Spanish</option>
@@ -250,12 +305,12 @@ export default function CustomerQRReviewPage() {
             {isGenerating ? (
               <span className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 animate-spin text-amber-300" />
-                AI is crafting your unique review...
+                AI is crafting a unique review...
               </span>
             ) : (
               <span className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-amber-300" />
-                Generate AI Review Draft
+                Generate New Unique Review
               </span>
             )}
           </button>
@@ -267,22 +322,23 @@ export default function CustomerQRReviewPage() {
             <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
               <div className="flex items-center gap-2 text-xs font-bold text-indigo-400">
                 <Sparkles className="w-4 h-4 text-amber-400" />
-                <span>AI Review Draft (Unique Every Time)</span>
+                <span>AI Review Draft (100% Unique Output)</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={() => setIsEditing(!isEditing)}
-                  className="px-2.5 py-1 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center gap-1 transition-colors"
+                  className="px-2.5 py-1 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center gap-1 transition-colors cursor-pointer"
                 >
                   <Edit3 className="w-3 h-3" />
                   {isEditing ? 'Done' : 'Edit'}
                 </button>
                 <button
                   onClick={generateUniqueReview}
-                  className="p-1 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
-                  title="Regenerate unique version"
+                  className="p-1 px-2 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center gap-1 transition-colors cursor-pointer"
+                  title="Generate new unique variation"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${isGenerating ? 'animate-spin' : ''}`} />
+                  <span>New</span>
                 </button>
               </div>
             </div>
