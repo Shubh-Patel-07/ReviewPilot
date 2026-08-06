@@ -28,6 +28,11 @@ export default function CustomerQRReviewPage() {
   const [selectedLanguage, setSelectedLanguage] = useState<string>('English');
   const [selectedTone, setSelectedTone] = useState<string>('Enthusiastic');
 
+  // Dynamic Google Review URL from Business Profile
+  const [googleReviewUrl, setGoogleReviewUrl] = useState<string>(
+    'https://search.google.com/local/writereview?placeid=ChIJN1t_tDeuEmsRUsoyG83frY4'
+  );
+
   // Variety Generator following expert rules
   const generateUniqueReview = () => {
     setIsGenerating(true);
@@ -89,8 +94,17 @@ export default function CustomerQRReviewPage() {
   };
 
   const handleOpenGoogle = () => {
+    // 1. Copy AI review draft to clipboard
     navigator.clipboard.writeText(aiDraft);
-    window.open('https://maps.google.com', '_blank');
+
+    // 2. Format URL cleanly with http/https prefix
+    let targetUrl = googleReviewUrl.trim();
+    if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
+      targetUrl = `https://${targetUrl}`;
+    }
+
+    // 3. Open business's exact Google Review link in new tab
+    window.open(targetUrl, '_blank');
   };
 
   return (
@@ -284,6 +298,18 @@ export default function CustomerQRReviewPage() {
               >
                 Post on Google <ExternalLink className="w-3.5 h-3.5" />
               </button>
+            </div>
+
+            {/* Editable Business Google Link Helper */}
+            <div className="pt-2 border-t border-slate-800/60 flex items-center justify-between text-[11px] text-slate-400">
+              <span>Target Link:</span>
+              <input
+                type="text"
+                value={googleReviewUrl}
+                onChange={(e) => setGoogleReviewUrl(e.target.value)}
+                placeholder="https://g.page/r/your-link"
+                className="bg-slate-950 border border-slate-800 text-blue-400 text-[11px] rounded-lg px-2 py-1 w-3/4 truncate focus:outline-none focus:ring-1 focus:ring-blue-600"
+              />
             </div>
           </div>
         )}
