@@ -19,6 +19,7 @@ export default function CustomerQRReviewPage() {
   const params = useParams();
   const businessId = (params?.businessId as string) || 'demo-business';
 
+  const [businessName, setBusinessName] = useState<string>('Aroma Roastery & Cafe');
   const [rating, setRating] = useState<number>(5);
   const [feedback, setFeedback] = useState<string>('');
   const [aiDraft, setAiDraft] = useState<string>('');
@@ -33,27 +34,38 @@ export default function CustomerQRReviewPage() {
     'https://search.google.com/local/writereview?placeid=ChIJN1t_tDeuEmsRUsoyG83frY4'
   );
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedUrl = localStorage.getItem('google_review_url');
+      if (savedUrl) setGoogleReviewUrl(savedUrl);
+
+      const savedName = localStorage.getItem('business_name');
+      if (savedName) setBusinessName(savedName);
+    }
+  }, []);
+
   // Variety Generator following expert rules
   const generateUniqueReview = () => {
     setIsGenerating(true);
     setTimeout(() => {
+      const bName = businessName || 'this business';
       const openings5 = [
-        "Stopped by Aroma Roastery today and was thoroughly impressed.",
-        "Honestly, Aroma Roastery exceeded what I was expecting.",
-        "Just left Aroma Roastery and felt compelled to leave a quick review.",
-        "I've been hearing great things about Aroma Roastery and finally gave them a try.",
-        "Can't say enough good things about my visit to Aroma Roastery today.",
+        `Stopped by ${bName} today and was thoroughly impressed.`,
+        `Honestly, ${bName} exceeded what I was expecting.`,
+        `Just left ${bName} and felt compelled to leave a quick review.`,
+        `I've been hearing great things about ${bName} and finally gave them a try.`,
+        `Can't say enough good things about my visit to ${bName} today.`,
       ];
 
       const openings4 = [
-        "Had a really solid experience at Aroma Roastery.",
-        "Overall very pleased with my visit to Aroma Roastery.",
-        "Consistently good service and quality at Aroma Roastery.",
+        `Had a really solid experience at ${bName}.`,
+        `Overall very pleased with my visit to ${bName}.`,
+        `Consistently good service and quality at ${bName}.`,
       ];
 
       const openings3 = [
-        "Fair experience overall at Aroma Roastery.",
-        "Decent visit to Aroma Roastery today.",
+        `Fair experience overall at ${bName}.`,
+        `Decent visit to ${bName} today.`,
       ];
 
       const details = [
@@ -85,7 +97,7 @@ export default function CustomerQRReviewPage() {
 
   useEffect(() => {
     generateUniqueReview();
-  }, [rating]);
+  }, [rating, businessName]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(aiDraft);
@@ -144,7 +156,7 @@ export default function CustomerQRReviewPage() {
 
           <div>
             <h1 className="text-2xl font-extrabold text-white tracking-tight">
-              Aroma Roastery & Cafe
+              {businessName}
             </h1>
             <p className="text-xs text-slate-400 mt-1 font-medium">
               Your feedback takes only 10 seconds & helps us grow!
@@ -306,7 +318,12 @@ export default function CustomerQRReviewPage() {
               <input
                 type="text"
                 value={googleReviewUrl}
-                onChange={(e) => setGoogleReviewUrl(e.target.value)}
+                onChange={(e) => {
+                  setGoogleReviewUrl(e.target.value);
+                  if (typeof window !== 'undefined') {
+                    localStorage.setItem('google_review_url', e.target.value);
+                  }
+                }}
                 placeholder="https://g.page/r/your-link"
                 className="bg-slate-950 border border-slate-800 text-blue-400 text-[11px] rounded-lg px-2 py-1 w-3/4 truncate focus:outline-none focus:ring-1 focus:ring-blue-600"
               />

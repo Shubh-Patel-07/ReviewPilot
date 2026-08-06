@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Building2,
   Globe,
@@ -24,8 +24,22 @@ export default function BusinessProfilePage() {
   const [address, setAddress] = useState('101 Coffee Street, Suite 4, San Francisco, CA 94107');
   const [isSaved, setIsSaved] = useState(false);
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedUrl = localStorage.getItem('google_review_url');
+      if (savedUrl) setGoogleUrl(savedUrl);
+
+      const savedName = localStorage.getItem('business_name');
+      if (savedName) setBusinessName(savedName);
+    }
+  }, []);
+
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('google_review_url', googleUrl);
+      localStorage.setItem('business_name', businessName);
+    }
     setIsSaved(true);
     setTimeout(() => setIsSaved(false), 2500);
   };
@@ -127,8 +141,8 @@ export default function BusinessProfilePage() {
         {/* Target Google Review Link */}
         <div className="space-y-1.5 pt-2">
           <label className="text-xs font-semibold text-slate-300 block flex items-center justify-between">
-            <span>Google Review Direct Link</span>
-            <span className="text-[11px] text-emerald-400 font-normal">Connected & Verified</span>
+            <span>Google Review Direct Link (Entered by Business)</span>
+            <span className="text-[11px] text-emerald-400 font-normal">Active Target URL</span>
           </label>
           <div className="relative">
             <Globe className="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5" />
@@ -137,6 +151,7 @@ export default function BusinessProfilePage() {
               required
               value={googleUrl}
               onChange={(e) => setGoogleUrl(e.target.value)}
+              placeholder="https://g.page/r/your-business-link"
               className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-600"
             />
           </div>
