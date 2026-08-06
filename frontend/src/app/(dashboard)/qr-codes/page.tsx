@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { QRCodeSVG } from 'qrcode.react';
 import {
   QrCode,
   Download,
@@ -24,23 +25,22 @@ export default function QRCodeGeneratorPage() {
   const [selectedFrame, setSelectedFrame] = useState('badge'); // badge, minimal, standee, border
   const [embedLogo, setEmbedLogo] = useState(true);
   const [copied, setCopied] = useState(false);
-  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const existingQRs = [
-    { id: '1', name: 'Main Counter Standee', type: 'Dynamic', scans: 1420, date: '2026-07-20', status: 'Active' },
-    { id: '2', name: 'Table Tent Stand #4', type: 'Dynamic', scans: 890, date: '2026-07-28', status: 'Active' },
-    { id: '3', name: 'Receipt Footer QR', type: 'Static', scans: 530, date: '2026-08-02', status: 'Active' },
+    { id: '1', name: 'Main Counter Standee', scans: 1420, status: 'Active', created: '2026-07-20', type: 'Dynamic' },
+    { id: '2', name: 'Table Tent Stand #4', scans: 890, status: 'Active', created: '2026-07-28', type: 'Dynamic' },
+    { id: '3', name: 'Receipt Footer QR', scans: 530, status: 'Active', created: '2026-08-02', type: 'Static' },
   ];
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText('http://localhost:3000/r/demo-business-123');
+    navigator.clipboard.writeText('http://localhost:3000/r/umiya-traders');
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto font-['Inter',sans-serif]">
-      {/* Top Header */}
+      {/* Top Banner Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-6">
         <div>
           <div className="flex items-center gap-2 text-xs font-bold text-blue-400 uppercase tracking-wider mb-1">
@@ -54,71 +54,69 @@ export default function QRCodeGeneratorPage() {
           </p>
         </div>
 
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-blue-600/25 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
-        >
-          <Plus className="w-4 h-4" /> Create New QR Code
-        </button>
+        <div className="flex items-center gap-3">
+          <button className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-blue-600/25 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer">
+            <Plus className="w-4 h-4" /> Create New QR Code
+          </button>
+        </div>
       </div>
 
-      {/* Main Grid: Customizer Controls (Left) & Real-Time Live Preview (Right) */}
+      {/* Main Grid: Customization Controls & Live Preview */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Controls Column */}
         <div className="lg:col-span-2 space-y-6">
           <div className="card-stripe rounded-3xl p-6 border border-slate-800 space-y-6">
-            <h2 className="text-lg font-bold text-white flex items-center gap-2 border-b border-slate-800/80 pb-3">
-              <Palette className="w-5 h-5 text-blue-400" /> QR Customization & Styling
-            </h2>
+            <h3 className="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-3">
+              <Palette className="w-4 h-4 text-blue-400" /> QR Customization & Styling
+            </h3>
 
-            {/* QR Label Input */}
+            {/* Label Input */}
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-slate-300 block">QR Code Name / Label</label>
               <input
                 type="text"
                 value={qrName}
                 onChange={(e) => setQrName(e.target.value)}
-                placeholder="e.g. Front Entrance Standee"
+                placeholder="e.g. Counter Standee, Table #2"
                 className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-600"
               />
             </div>
 
             {/* Color Pickers */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 space-y-2">
+              <div className="space-y-1.5 p-4 rounded-2xl bg-slate-950 border border-slate-800">
                 <label className="text-xs font-semibold text-slate-300 block">Foreground Color</label>
                 <div className="flex items-center gap-3">
                   <input
                     type="color"
                     value={fgColor}
                     onChange={(e) => setFgColor(e.target.value)}
-                    className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 cursor-pointer"
+                    className="w-10 h-10 rounded-xl border-0 cursor-pointer bg-transparent"
                   />
-                  <span className="text-xs text-slate-400 uppercase font-mono font-bold">{fgColor}</span>
+                  <span className="font-mono text-xs text-slate-400 uppercase">{fgColor}</span>
                 </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 space-y-2">
+              <div className="space-y-1.5 p-4 rounded-2xl bg-slate-950 border border-slate-800">
                 <label className="text-xs font-semibold text-slate-300 block">Background Color</label>
                 <div className="flex items-center gap-3">
                   <input
                     type="color"
                     value={bgColor}
                     onChange={(e) => setBgColor(e.target.value)}
-                    className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 cursor-pointer"
+                    className="w-10 h-10 rounded-xl border-0 cursor-pointer bg-transparent"
                   />
-                  <span className="text-xs text-slate-400 uppercase font-mono font-bold">{bgColor}</span>
+                  <span className="font-mono text-xs text-slate-400 uppercase">{bgColor}</span>
                 </div>
               </div>
             </div>
 
-            {/* Frame Selection */}
+            {/* Frame Template Selector */}
             <div className="space-y-3">
-              <label className="text-xs font-semibold text-slate-300 block flex items-center justify-between">
-                <span>Select Frame Template</span>
-                <span className="text-[11px] text-blue-400 font-normal">4 Frame Options</span>
-              </label>
-
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-slate-300 block">Select Frame Template</label>
+                <span className="text-[11px] text-slate-500">4 Frame Options</span>
+              </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {[
                   { id: 'badge', name: 'Badge Style' },
@@ -128,12 +126,11 @@ export default function QRCodeGeneratorPage() {
                 ].map((frame) => (
                   <button
                     key={frame.id}
-                    type="button"
                     onClick={() => setSelectedFrame(frame.id)}
-                    className={`p-3 rounded-2xl border text-xs font-semibold transition-all text-center cursor-pointer ${
+                    className={`py-3 px-3 rounded-2xl text-xs font-bold transition-all border ${
                       selectedFrame === frame.id
-                        ? 'bg-blue-600/20 border-blue-500 text-white shadow-lg shadow-blue-500/10'
-                        : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700'
+                        ? 'bg-blue-600/20 text-blue-400 border-blue-500/80 shadow-md shadow-blue-600/10'
+                        : 'bg-slate-950 text-slate-400 border-slate-800 hover:border-slate-700'
                     }`}
                   >
                     {frame.name}
@@ -143,9 +140,11 @@ export default function QRCodeGeneratorPage() {
             </div>
 
             {/* Logo Embed Toggle */}
-            <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
+            <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-950 border border-slate-800">
               <div className="flex items-center gap-3">
-                <ImageIcon className="w-5 h-5 text-indigo-400" />
+                <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-400">
+                  <ImageIcon className="w-4 h-4" />
+                </div>
                 <div>
                   <p className="text-xs font-bold text-white">Embed Business Logo in Center</p>
                   <p className="text-[11px] text-slate-400">Places your logo avatar at the center of the QR matrix</p>
@@ -178,17 +177,20 @@ export default function QRCodeGeneratorPage() {
                   : 'bg-slate-950 border border-slate-800'
               }`}
             >
-              {/* QR Container */}
+              {/* Real QR Container */}
               <div
                 style={{ backgroundColor: bgColor }}
                 className="p-4 rounded-2xl shadow-xl flex items-center justify-center relative border border-slate-700"
               >
-                <div
-                  style={{ color: fgColor }}
-                  className="w-44 h-44 border-2 border-dashed border-slate-400 rounded-xl flex flex-col items-center justify-center relative font-mono text-xs font-bold"
-                >
-                  <span style={{ color: fgColor }}>[ QR MATRIX ]</span>
-                  <span className="text-[9px] text-slate-500 mt-1">Scan Me</span>
+                <div className="relative flex items-center justify-center">
+                  <QRCodeSVG
+                    value="http://localhost:3000/r/umiya-traders"
+                    size={176}
+                    bgColor={bgColor}
+                    fgColor={fgColor}
+                    level="H"
+                    includeMargin={false}
+                  />
 
                   {embedLogo && (
                     <div className="absolute inset-0 m-auto w-10 h-10 rounded-xl bg-slate-900 border-2 border-white flex items-center justify-center text-lg font-bold text-white shadow-md">
@@ -207,13 +209,13 @@ export default function QRCodeGeneratorPage() {
             {/* Download & Copy Buttons */}
             <div className="space-y-2 pt-2">
               <div className="grid grid-cols-3 gap-2">
-                <button className="py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center justify-center gap-1 transition-all shadow-md">
+                <button className="py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center justify-center gap-1 transition-all shadow-md cursor-pointer">
                   <Download className="w-3.5 h-3.5" /> PNG
                 </button>
-                <button className="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center justify-center gap-1 transition-all">
+                <button className="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center justify-center gap-1 transition-all cursor-pointer">
                   <Download className="w-3.5 h-3.5" /> SVG
                 </button>
-                <button className="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center justify-center gap-1 transition-all">
+                <button className="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center justify-center gap-1 transition-all cursor-pointer">
                   <Download className="w-3.5 h-3.5" /> PDF
                 </button>
               </div>
@@ -249,23 +251,31 @@ export default function QRCodeGeneratorPage() {
                 </span>
               </div>
 
-              <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex items-center justify-center">
-                <div className="w-24 h-24 bg-white p-2 rounded-xl flex items-center justify-center border border-slate-700">
-                  <span className="text-[9px] font-bold text-slate-900 text-center">[ QR CODE ]</span>
+              {/* Real QR Rendering in Card */}
+              <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col items-center justify-center text-center">
+                <div className="w-28 h-28 bg-white p-2 rounded-xl shadow-lg border border-slate-700 flex items-center justify-center">
+                  <QRCodeSVG
+                    value="http://localhost:3000/r/umiya-traders"
+                    size={96}
+                    bgColor="#FFFFFF"
+                    fgColor="#0F172A"
+                    level="H"
+                    includeMargin={false}
+                  />
                 </div>
               </div>
 
-              <div className="flex items-center justify-between text-xs text-slate-400 border-t border-slate-800/80 pt-3">
-                <span>Total Scans: <strong className="text-white font-bold">{qr.scans}</strong></span>
-                <span>Created: {qr.date}</span>
+              <div className="flex items-center justify-between text-xs text-slate-400 pt-1">
+                <span>Total Scans: <strong className="text-white">{qr.scans}</strong></span>
+                <span>Created: {qr.created}</span>
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
-                <button className="py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center justify-center gap-1">
+              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800/80">
+                <button className="py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-[11px] font-semibold text-slate-200 flex items-center justify-center gap-1 transition-colors cursor-pointer">
                   <Download className="w-3 h-3" /> PNG
                 </button>
-                <Link href="/r/demo-business-123" target="_blank" className="w-full">
-                  <button className="w-full py-2 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 text-xs font-semibold flex items-center justify-center gap-1">
+                <Link href="/r/umiya-traders" target="_blank" className="w-full">
+                  <button className="w-full py-2 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-[11px] font-semibold text-blue-300 flex items-center justify-center gap-1 transition-colors cursor-pointer">
                     <ExternalLink className="w-3 h-3" /> Test URL
                   </button>
                 </Link>
