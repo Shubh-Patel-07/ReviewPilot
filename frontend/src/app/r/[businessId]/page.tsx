@@ -11,8 +11,6 @@ import {
   Edit3,
   ExternalLink,
   ShieldCheck,
-  Heart,
-  MessageSquare,
   Building2,
   CheckCircle2,
 } from 'lucide-react';
@@ -30,31 +28,58 @@ export default function CustomerQRReviewPage() {
   const [selectedLanguage, setSelectedLanguage] = useState<string>('English');
   const [selectedTone, setSelectedTone] = useState<string>('Enthusiastic');
 
-  // Sample AI review generation logic
-  const handleGenerateAI = () => {
+  // Variety Generator following expert rules
+  const generateUniqueReview = () => {
     setIsGenerating(true);
     setTimeout(() => {
+      const openings5 = [
+        "Stopped by Aroma Roastery today and was thoroughly impressed.",
+        "Honestly, Aroma Roastery exceeded what I was expecting.",
+        "Just left Aroma Roastery and felt compelled to leave a quick review.",
+        "I've been hearing great things about Aroma Roastery and finally gave them a try.",
+        "Can't say enough good things about my visit to Aroma Roastery today.",
+      ];
+
+      const openings4 = [
+        "Had a really solid experience at Aroma Roastery.",
+        "Overall very pleased with my visit to Aroma Roastery.",
+        "Consistently good service and quality at Aroma Roastery.",
+      ];
+
+      const openings3 = [
+        "Fair experience overall at Aroma Roastery.",
+        "Decent visit to Aroma Roastery today.",
+      ];
+
+      const details = [
+        feedback ? `Loved that ${feedback}. Everything was handled with great care and attention.` : "The atmosphere was welcoming and the team was genuinely attentive throughout.",
+        feedback ? `Highlight of the visit was definitely ${feedback}.` : "The quality stood out immediately and the staff made sure every detail was taken care of.",
+        feedback ? `Really appreciated how ${feedback}.` : "Fast, friendly, and consistently top quality from start to finish.",
+      ];
+
+      const endings = [
+        "Will definitely be returning again soon!",
+        "10/10 recommend checking them out if you haven't already.",
+        "Couldn't have asked for a better overall experience.",
+        "Definitely earned a permanent spot on my list of favorites.",
+      ];
+
       let draft = '';
       if (rating === 5) {
-        draft = `Absolute 5-star experience at Aroma Roastery! ${
-          feedback ? `Loved that ${feedback}. ` : ''
-        }The service was warm, the atmosphere was wonderful, and everything exceeded my expectations. Will definitely be returning soon!`;
+        draft = `${openings5[Math.floor(Math.random() * openings5.length)]} ${details[Math.floor(Math.random() * details.length)]} ${endings[Math.floor(Math.random() * endings.length)]}`;
       } else if (rating === 4) {
-        draft = `Really great experience overall! ${
-          feedback ? `"${feedback}" — ` : ''
-        }The team was attentive and the quality was top-notch. Highly recommend checking them out!`;
+        draft = `${openings4[Math.floor(Math.random() * openings4.length)]} ${details[Math.floor(Math.random() * details.length)]} Will be back again!`;
       } else {
-        draft = `Appreciate the team's effort! ${
-          feedback ? feedback : 'Decent service.'
-        } Hoping to see even further improvements on my next visit. Thanks!`;
+        draft = `${openings3[Math.floor(Math.random() * openings3.length)]} ${feedback ? feedback : 'Staff was polite.'} Hoping for an even better visit next time.`;
       }
+
       setAiDraft(draft);
       setIsGenerating(false);
-    }, 700);
+    }, 600);
   };
 
   useEffect(() => {
-    handleGenerateAI();
+    generateUniqueReview();
   }, [rating]);
 
   const handleCopy = () => {
@@ -74,7 +99,7 @@ export default function CustomerQRReviewPage() {
       <div className="glow-mesh-blue top-0 -left-20 opacity-40" />
       <div className="glow-mesh-indigo bottom-0 -right-20 opacity-40" />
 
-      {/* Top Header / Branding */}
+      {/* Header */}
       <header className="w-full max-w-md flex items-center justify-between py-2 z-10">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
@@ -83,7 +108,7 @@ export default function CustomerQRReviewPage() {
           <span className="text-sm font-bold tracking-wide text-slate-200">ReviewAI</span>
         </div>
         <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1 font-medium">
-          <ShieldCheck className="w-3 h-3" /> Official Review Assistant
+          <ShieldCheck className="w-3.5 h-3.5" /> Official Review Assistant
         </span>
       </header>
 
@@ -153,7 +178,7 @@ export default function CustomerQRReviewPage() {
             />
           </div>
 
-          {/* Tone & Language Quick Toggles */}
+          {/* Tone & Language Toggles */}
           <div className="flex items-center justify-between text-xs text-slate-400 pt-1">
             <div className="flex items-center gap-1.5">
               <span className="text-[11px] text-slate-500">Tone:</span>
@@ -185,14 +210,14 @@ export default function CustomerQRReviewPage() {
 
           {/* Generate AI Review Button */}
           <button
-            onClick={handleGenerateAI}
+            onClick={generateUniqueReview}
             disabled={isGenerating}
-            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm shadow-xl shadow-blue-600/30 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm shadow-xl shadow-blue-600/30 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer btn-glow"
           >
             {isGenerating ? (
               <span className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 animate-spin text-amber-300" />
-                AI is crafting your review...
+                AI is crafting your unique review...
               </span>
             ) : (
               <span className="flex items-center gap-2">
@@ -205,11 +230,11 @@ export default function CustomerQRReviewPage() {
 
         {/* Generated AI Review Container */}
         {aiDraft && (
-          <div className="card-stripe rounded-3xl p-5 space-y-4 border border-blue-500/30 shadow-2xl relative">
+          <div className="card-stripe-glow rounded-3xl p-5 space-y-4 relative">
             <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
               <div className="flex items-center gap-2 text-xs font-bold text-indigo-400">
                 <Sparkles className="w-4 h-4 text-amber-400" />
-                <span>AI Review Draft (Ready to Post)</span>
+                <span>AI Review Draft (Unique Every Time)</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <button
@@ -220,9 +245,9 @@ export default function CustomerQRReviewPage() {
                   {isEditing ? 'Done' : 'Edit'}
                 </button>
                 <button
-                  onClick={handleGenerateAI}
+                  onClick={generateUniqueReview}
                   className="p-1 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
-                  title="Regenerate"
+                  title="Regenerate unique version"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${isGenerating ? 'animate-spin' : ''}`} />
                 </button>
@@ -238,7 +263,7 @@ export default function CustomerQRReviewPage() {
                 className="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 text-xs leading-relaxed focus:outline-none focus:ring-2 focus:ring-blue-600"
               />
             ) : (
-              <p className="text-xs text-slate-200 leading-relaxed italic bg-slate-950/60 p-4 rounded-xl border border-slate-800/60">
+              <p className="text-xs text-slate-200 leading-relaxed italic bg-slate-950/80 p-4 rounded-xl border border-slate-800/80">
                 "{aiDraft}"
               </p>
             )}
