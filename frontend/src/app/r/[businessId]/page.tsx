@@ -1,112 +1,273 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Star } from "lucide-react";
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
+import {
+  Star,
+  Sparkles,
+  Copy,
+  Check,
+  RefreshCw,
+  Edit3,
+  ExternalLink,
+  ShieldCheck,
+  Heart,
+  MessageSquare,
+  Building2,
+  CheckCircle2,
+} from 'lucide-react';
 
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
+export default function CustomerQRReviewPage() {
+  const params = useParams();
+  const businessId = (params?.businessId as string) || 'demo-business';
 
-export default function QRScanPage({ params }: { params: { businessId: string } }) {
-  const [rating, setRating] = useState(0);
-  const [hoverRating, setHoverRating] = useState(0);
-  const [feedback, setFeedback] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [aiDraft, setAiDraft] = useState("");
+  const [rating, setRating] = useState<number>(5);
+  const [feedback, setFeedback] = useState<string>('');
+  const [aiDraft, setAiDraft] = useState<string>('');
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
+  const [copied, setCopied] = useState<boolean>(false);
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('English');
+  const [selectedTone, setSelectedTone] = useState<string>('Enthusiastic');
 
-  const handleGenerate = async () => {
-    if (rating === 0) return;
-    setLoading(true);
-    // Simulate AI generation
+  // Sample AI review generation logic
+  const handleGenerateAI = () => {
+    setIsGenerating(true);
     setTimeout(() => {
-      setAiDraft(`I had an amazing experience at this business! The service was outstanding, and the staff was incredibly friendly and helpful. Highly recommend to anyone looking for top-notch quality.`);
-      setLoading(false);
-    }, 1500);
+      let draft = '';
+      if (rating === 5) {
+        draft = `Absolute 5-star experience at Aroma Roastery! ${
+          feedback ? `Loved that ${feedback}. ` : ''
+        }The service was warm, the atmosphere was wonderful, and everything exceeded my expectations. Will definitely be returning soon!`;
+      } else if (rating === 4) {
+        draft = `Really great experience overall! ${
+          feedback ? `"${feedback}" — ` : ''
+        }The team was attentive and the quality was top-notch. Highly recommend checking them out!`;
+      } else {
+        draft = `Appreciate the team's effort! ${
+          feedback ? feedback : 'Decent service.'
+        } Hoping to see even further improvements on my next visit. Thanks!`;
+      }
+      setAiDraft(draft);
+      setIsGenerating(false);
+    }, 700);
+  };
+
+  useEffect(() => {
+    handleGenerateAI();
+  }, [rating]);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(aiDraft);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleOpenGoogle = () => {
+    navigator.clipboard.writeText(aiDraft);
+    window.open('https://maps.google.com', '_blank');
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-xl overflow-hidden">
-        <div className="bg-primary p-8 text-center text-primary-foreground">
-          <div className="w-20 h-20 bg-white rounded-full mx-auto mb-4 flex items-center justify-center shadow-inner">
-            <span className="text-3xl font-bold text-primary">B</span>
+    <div className="min-h-screen bg-[#0F172A] text-slate-100 flex flex-col items-center justify-between p-4 sm:p-6 relative overflow-hidden font-['Inter',sans-serif]">
+      {/* Background Ambient Glow */}
+      <div className="glow-mesh-blue top-0 -left-20 opacity-40" />
+      <div className="glow-mesh-indigo bottom-0 -right-20 opacity-40" />
+
+      {/* Top Header / Branding */}
+      <header className="w-full max-w-md flex items-center justify-between py-2 z-10">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
+            <Sparkles className="w-4 h-4" />
           </div>
-          <h1 className="text-2xl font-bold mb-1">Business Name</h1>
-          <p className="opacity-90 text-sm">We value your feedback!</p>
+          <span className="text-sm font-bold tracking-wide text-slate-200">ReviewAI</span>
         </div>
+        <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1 font-medium">
+          <ShieldCheck className="w-3 h-3" /> Official Review Assistant
+        </span>
+      </header>
 
-        <div className="p-8">
-          {!aiDraft ? (
-            <div className="flex flex-col gap-6">
-              <div className="text-center">
-                <h2 className="text-xl font-semibold mb-4">How was your experience?</h2>
-                <div className="flex justify-center gap-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      className="focus:outline-none transition-transform hover:scale-110"
-                      onMouseEnter={() => setHoverRating(star)}
-                      onMouseLeave={() => setHoverRating(0)}
-                      onClick={() => setRating(star)}
-                    >
-                      <Star
-                        size={40}
-                        className={cn(
-                          "transition-colors",
-                          (hoverRating || rating) >= star
-                            ? "fill-yellow-400 text-yellow-400"
-                            : "text-gray-300"
-                        )}
-                      />
-                    </button>
-                  ))}
-                </div>
+      {/* Main Glass Card */}
+      <main className="w-full max-w-md my-auto z-10 space-y-5">
+        {/* Business Hero Card */}
+        <div className="card-stripe rounded-3xl p-6 text-center relative overflow-hidden space-y-4 border border-slate-800 shadow-2xl">
+          {/* Logo Avatar */}
+          <div className="relative mx-auto w-20 h-20">
+            <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 p-0.5 shadow-xl shadow-indigo-500/20">
+              <div className="w-full h-full rounded-2xl bg-slate-900 flex items-center justify-center text-3xl font-extrabold text-white">
+                ☕
               </div>
+            </div>
+            <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-white rounded-full p-1 border-2 border-slate-900 shadow">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+            </div>
+          </div>
 
-              {rating > 0 && (
-                <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
-                  <textarea
-                    placeholder="Tell us a bit more (optional)..."
-                    className="w-full p-4 border rounded-xl mb-4 focus:ring-2 focus:ring-primary focus:outline-none resize-none"
-                    rows={3}
-                    value={feedback}
-                    onChange={(e) => setFeedback(e.target.value)}
+          <div>
+            <h1 className="text-2xl font-extrabold text-white tracking-tight">
+              Aroma Roastery & Cafe
+            </h1>
+            <p className="text-xs text-slate-400 mt-1 font-medium">
+              Your feedback takes only 10 seconds & helps us grow!
+            </p>
+          </div>
+
+          {/* Interactive Star Rating Selector */}
+          <div className="pt-2">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+              Tap to Rate Your Visit
+            </p>
+            <div className="flex justify-center items-center gap-2 bg-slate-950/60 py-3 px-4 rounded-2xl border border-slate-800">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  onClick={() => setRating(star)}
+                  type="button"
+                  className="transition-all duration-200 hover:scale-125 focus:outline-none cursor-pointer"
+                >
+                  <Star
+                    size={34}
+                    className={`${
+                      star <= rating
+                        ? 'fill-amber-400 text-amber-400 drop-shadow-[0_0_12px_rgba(251,191,36,0.6)]'
+                        : 'fill-slate-800 text-slate-700'
+                    } transition-all`}
                   />
-                  <button
-                    onClick={handleGenerate}
-                    disabled={loading}
-                    className="w-full py-4 bg-primary text-white rounded-xl font-semibold text-lg flex justify-center items-center gap-2 hover:bg-primary/90 transition-colors disabled:opacity-70"
-                  >
-                    {loading ? (
-                      <span className="animate-spin w-5 h-5 border-2 border-white/30 border-t-white rounded-full" />
-                    ) : (
-                      "Generate Magic Review ✨"
-                    )}
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="animate-in fade-in zoom-in-95 duration-500">
-              <h2 className="text-xl font-semibold mb-4 text-center">Your AI Draft</h2>
-              <div className="bg-gray-50 p-5 rounded-xl border mb-6 relative">
-                <p className="text-gray-700 italic">"{aiDraft}"</p>
-              </div>
-              <div className="flex flex-col gap-3">
-                <button className="w-full py-3 bg-gray-900 text-white rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-gray-800">
-                  Copy & Open Google
                 </button>
-                <div className="flex gap-3">
-                  <button className="flex-1 py-3 border rounded-xl font-medium hover:bg-gray-50">Edit</button>
-                  <button className="flex-1 py-3 border rounded-xl font-medium hover:bg-gray-50">Regenerate</button>
-                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Optional Short Feedback Textarea */}
+          <div className="space-y-1 text-left pt-1">
+            <label className="text-xs font-medium text-slate-300 flex items-center justify-between">
+              <span>Optional Comment / Highlights</span>
+              <span className="text-[10px] text-slate-500">helps AI customize your review</span>
+            </label>
+            <input
+              type="text"
+              value={feedback}
+              onChange={(e) => setFeedback(e.target.value)}
+              placeholder="e.g. Great cappuccino, friendly barista..."
+              className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all"
+            />
+          </div>
+
+          {/* Tone & Language Quick Toggles */}
+          <div className="flex items-center justify-between text-xs text-slate-400 pt-1">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[11px] text-slate-500">Tone:</span>
+              <select
+                value={selectedTone}
+                onChange={(e) => setSelectedTone(e.target.value)}
+                className="bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-lg px-2 py-1 focus:outline-none"
+              >
+                <option value="Enthusiastic">Enthusiastic</option>
+                <option value="Professional">Professional</option>
+                <option value="Casual">Casual</option>
+                <option value="Detailed">Detailed</option>
+              </select>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[11px] text-slate-500">Language:</span>
+              <select
+                value={selectedLanguage}
+                onChange={(e) => setSelectedLanguage(e.target.value)}
+                className="bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-lg px-2 py-1 focus:outline-none"
+              >
+                <option value="English">English</option>
+                <option value="Spanish">Spanish</option>
+                <option value="French">French</option>
+                <option value="Hindi">Hindi</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Generate AI Review Button */}
+          <button
+            onClick={handleGenerateAI}
+            disabled={isGenerating}
+            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm shadow-xl shadow-blue-600/30 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
+          >
+            {isGenerating ? (
+              <span className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 animate-spin text-amber-300" />
+                AI is crafting your review...
+              </span>
+            ) : (
+              <span className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-amber-300" />
+                Generate AI Review Draft
+              </span>
+            )}
+          </button>
+        </div>
+
+        {/* Generated AI Review Container */}
+        {aiDraft && (
+          <div className="card-stripe rounded-3xl p-5 space-y-4 border border-blue-500/30 shadow-2xl relative">
+            <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
+              <div className="flex items-center gap-2 text-xs font-bold text-indigo-400">
+                <Sparkles className="w-4 h-4 text-amber-400" />
+                <span>AI Review Draft (Ready to Post)</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => setIsEditing(!isEditing)}
+                  className="px-2.5 py-1 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center gap-1 transition-colors"
+                >
+                  <Edit3 className="w-3 h-3" />
+                  {isEditing ? 'Done' : 'Edit'}
+                </button>
+                <button
+                  onClick={handleGenerateAI}
+                  className="p-1 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
+                  title="Regenerate"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isGenerating ? 'animate-spin' : ''}`} />
+                </button>
               </div>
             </div>
-          )}
-        </div>
-      </div>
+
+            {/* Review Draft Editable Text */}
+            {isEditing ? (
+              <textarea
+                value={aiDraft}
+                onChange={(e) => setAiDraft(e.target.value)}
+                rows={4}
+                className="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 text-xs leading-relaxed focus:outline-none focus:ring-2 focus:ring-blue-600"
+              />
+            ) : (
+              <p className="text-xs text-slate-200 leading-relaxed italic bg-slate-950/60 p-4 rounded-xl border border-slate-800/60">
+                "{aiDraft}"
+              </p>
+            )}
+
+            {/* Action Buttons: Copy & Open Google Review */}
+            <div className="grid grid-cols-2 gap-3 pt-1">
+              <button
+                onClick={handleCopy}
+                className="py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-100 text-xs font-semibold flex items-center justify-center gap-2 border border-slate-700/80 transition-all cursor-pointer"
+              >
+                {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                {copied ? 'Copied to Clipboard!' : 'Copy Review'}
+              </button>
+
+              <button
+                onClick={handleOpenGoogle}
+                className="py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-1.5 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+              >
+                Post on Google <ExternalLink className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* Footer Disclaimer */}
+      <footer className="w-full max-w-md text-center py-4 text-[11px] text-slate-500 z-10">
+        ReviewAI does not auto-post reviews. You are in full control of what you publish on Google.
+      </footer>
     </div>
   );
 }
