@@ -14,15 +14,13 @@ import {
   Building2,
   CheckCircle2,
   X,
-  Zap,
-  MousePointerClick,
 } from 'lucide-react';
 
 export default function CustomerQRReviewPage() {
   const params = useParams();
-  const businessId = (params?.businessId as string) || 'demo-business';
+  const businessId = (params?.businessId as string) || 'umiya-traders';
 
-  const [businessName, setBusinessName] = useState<string>('Aroma Roastery & Cafe');
+  const [businessName, setBusinessName] = useState<string>('Umiya Traders');
   const [rating, setRating] = useState<number>(5);
   const [feedback, setFeedback] = useState<string>('');
   const [aiDraft, setAiDraft] = useState<string>('');
@@ -33,18 +31,36 @@ export default function CustomerQRReviewPage() {
   const [selectedLanguage, setSelectedLanguage] = useState<string>('English');
   const [selectedTone, setSelectedTone] = useState<string>('Enthusiastic');
 
-  // Dynamic Google Review URL from Business Profile
-  const [googleReviewUrl, setGoogleReviewUrl] = useState<string>(
-    'https://search.google.com/local/writereview?placeid=ChIJN1t_tDeuEmsRUsoyG83frY4'
-  );
+  // Exact Google Review Direct Action Link for Umiya Traders
+  const UMIYA_DIRECT_LINK = 'https://www.google.com/maps/place/Umiya+traders/@23.8500156,72.1210274,17z/data=!4m15!1m8!3m7!1s0x395c870e52c628c7:0xc460ce380999c40d!2sUmiya+traders!8m2!3d23.8500156!4d72.1210274!10e1!16s%2Fg%2F11ptz85sym!3m5!1s0x395c870e52c628c7:0xc460ce380999c40d!8m2!3d23.8500156!4d72.1210274!16s%2Fg%2F11ptz85sym?entry=ttu&action=write-review';
+
+  const [googleReviewUrl, setGoogleReviewUrl] = useState<string>(UMIYA_DIRECT_LINK);
+
+  // Helper to ensure URL triggers Google's Direct Review Popup
+  const getDirectReviewUrl = (rawUrl: string) => {
+    let url = rawUrl.trim();
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = `https://${url}`;
+    }
+    // If it's a standard google maps place link and missing action=write-review, append it
+    if (url.includes('google.com/maps') && !url.includes('action=write-review')) {
+      url += url.includes('?') ? '&action=write-review' : '?action=write-review';
+    }
+    return url;
+  };
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedUrl = localStorage.getItem('google_review_url');
-      if (savedUrl) setGoogleReviewUrl(savedUrl);
+      if (savedUrl) {
+        setGoogleReviewUrl(getDirectReviewUrl(savedUrl));
+      } else {
+        localStorage.setItem('google_review_url', UMIYA_DIRECT_LINK);
+      }
 
       const savedName = localStorage.getItem('business_name');
       if (savedName) setBusinessName(savedName);
+      else localStorage.setItem('business_name', 'Umiya Traders');
     }
   }, []);
 
@@ -52,19 +68,19 @@ export default function CustomerQRReviewPage() {
   const generateUniqueReview = () => {
     setIsGenerating(true);
     setTimeout(() => {
-      const bName = businessName || 'this business';
+      const bName = businessName || 'Umiya Traders';
       const openings5 = [
-        `Stopped by ${bName} today and was thoroughly impressed.`,
-        `Honestly, ${bName} exceeded what I was expecting.`,
-        `Just left ${bName} and felt compelled to leave a quick review.`,
-        `I've been hearing great things about ${bName} and finally gave them a try.`,
-        `Can't say enough good things about my visit to ${bName} today.`,
+        `Stopped by ${bName} today and was thoroughly impressed with their collection and service.`,
+        `Honestly, ${bName} exceeded what I was expecting. Excellent quality products!`,
+        `Just finished my visit at ${bName} and felt compelled to drop a quick review.`,
+        `I've been dealing with ${bName} for a while now and they never disappoint.`,
+        `Can't say enough good things about my experience at ${bName}.`,
       ];
 
       const openings4 = [
-        `Had a really solid experience at ${bName}.`,
-        `Overall very pleased with my visit to ${bName}.`,
-        `Consistently good service and quality at ${bName}.`,
+        `Had a really solid experience at ${bName}. Good quality and fair pricing.`,
+        `Overall very pleased with my purchase from ${bName}.`,
+        `Consistently good service and genuine items at ${bName}.`,
       ];
 
       const openings3 = [
@@ -73,25 +89,25 @@ export default function CustomerQRReviewPage() {
       ];
 
       const details = [
-        feedback ? `Loved that ${feedback}. Everything was handled with great care and attention.` : "The atmosphere was welcoming and the team was genuinely attentive throughout.",
-        feedback ? `Highlight of the visit was definitely ${feedback}.` : "The quality stood out immediately and the staff made sure every detail was taken care of.",
-        feedback ? `Really appreciated how ${feedback}.` : "Fast, friendly, and consistently top quality from start to finish.",
+        feedback ? `Loved that ${feedback}. Everything was handled with great care and professionalism.` : "The customer service was friendly, knowledgeable, and genuinely helpful throughout.",
+        feedback ? `Highlight of the visit was definitely ${feedback}.` : "Product quality stood out immediately and the team made sure everything went smoothly.",
+        feedback ? `Really appreciated how ${feedback}.` : "Prompt assistance, great pricing, and top quality service from start to finish.",
       ];
 
       const endings = [
-        "Will definitely be returning again soon!",
-        "10/10 recommend checking them out if you haven't already.",
-        "Couldn't have asked for a better overall experience.",
-        "Definitely earned a permanent spot on my list of favorites.",
+        "Will definitely be coming back again soon!",
+        "10/10 recommend checking out Umiya Traders if you haven't already.",
+        "Couldn't have asked for a better overall buying experience.",
+        "Definitely earned a permanent spot as my go-to choice.",
       ];
 
       let draft = '';
       if (rating === 5) {
         draft = `${openings5[Math.floor(Math.random() * openings5.length)]} ${details[Math.floor(Math.random() * details.length)]} ${endings[Math.floor(Math.random() * endings.length)]}`;
       } else if (rating === 4) {
-        draft = `${openings4[Math.floor(Math.random() * openings4.length)]} ${details[Math.floor(Math.random() * details.length)]} Will be back again!`;
+        draft = `${openings4[Math.floor(Math.random() * openings4.length)]} ${details[Math.floor(Math.random() * details.length)]} Will visit again!`;
       } else {
-        draft = `${openings3[Math.floor(Math.random() * openings3.length)]} ${feedback ? feedback : 'Staff was polite.'} Hoping for an even better visit next time.`;
+        draft = `${openings3[Math.floor(Math.random() * openings3.length)]} ${feedback ? feedback : 'Staff was polite.'} Hoping for an even better experience next time.`;
       }
 
       setAiDraft(draft);
@@ -117,13 +133,10 @@ export default function CustomerQRReviewPage() {
     // 2. Show floating action guidance bar
     setShowFloatingActionBar(true);
 
-    // 3. Format URL cleanly with http/https prefix
-    let targetUrl = googleReviewUrl.trim();
-    if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
-      targetUrl = `https://${targetUrl}`;
-    }
+    // 3. Format URL with Google's direct review trigger
+    const targetUrl = getDirectReviewUrl(googleReviewUrl);
 
-    // 4. Open business's exact Google Review link in new tab
+    // 4. Open direct review popup link in new tab
     window.open(targetUrl, '_blank');
   };
 
@@ -142,7 +155,7 @@ export default function CustomerQRReviewPage() {
           <span className="text-sm font-bold tracking-wide text-slate-200">ReviewAI</span>
         </div>
         <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1 font-medium">
-          <ShieldCheck className="w-3.5 h-3.5" /> Official Review Assistant
+          <ShieldCheck className="w-3.5 h-3.5" /> Verified Google Business
         </span>
       </header>
 
@@ -154,7 +167,7 @@ export default function CustomerQRReviewPage() {
           <div className="relative mx-auto w-20 h-20">
             <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 p-0.5 shadow-xl shadow-indigo-500/20">
               <div className="w-full h-full rounded-2xl bg-slate-900 flex items-center justify-center text-3xl font-extrabold text-white">
-                ☕
+                🏭
               </div>
             </div>
             <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-white rounded-full p-1 border-2 border-slate-900 shadow">
@@ -207,7 +220,7 @@ export default function CustomerQRReviewPage() {
               type="text"
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
-              placeholder="e.g. Great cappuccino, friendly barista..."
+              placeholder="e.g. Great products, fast service..."
               className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all"
             />
           </div>
@@ -302,7 +315,7 @@ export default function CustomerQRReviewPage() {
               </p>
             )}
 
-            {/* Action Buttons: Copy & Open Google Review */}
+            {/* Action Buttons: Copy & Open Direct Google Review */}
             <div className="grid grid-cols-2 gap-3 pt-1">
               <button
                 onClick={handleCopy}
@@ -328,7 +341,7 @@ export default function CustomerQRReviewPage() {
         <div className="fixed bottom-6 right-6 z-50 max-w-sm w-full card-stripe-glow rounded-3xl p-5 border border-emerald-500/40 shadow-2xl space-y-3 animate-in slide-in-from-bottom duration-300">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
-              <Check className="w-4 h-4" /> Review Copied! Ready to Paste
+              <Check className="w-4 h-4" /> Review Copied! Direct Popup Opened
             </span>
             <button
               onClick={() => setShowFloatingActionBar(false)}
@@ -340,7 +353,7 @@ export default function CustomerQRReviewPage() {
 
           <div className="p-3 rounded-2xl bg-slate-950/90 border border-slate-800 text-xs space-y-2">
             <div className="flex items-center justify-between text-[11px] text-slate-400">
-              <span>On Google's Popup Screen:</span>
+              <span>On Umiya Traders Google Page:</span>
               <span className="text-amber-400 font-bold">⭐ Tap 5th Star</span>
             </div>
             <div className="flex items-center gap-2">
