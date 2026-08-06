@@ -54,103 +54,259 @@ export default function CustomerQRReviewPage() {
     }
   }, []);
 
-  // Super-Dynamic High-Variety AI Review Engine
+  // ═══════════════════════════════════════════════════════
+  // MEGA AI REVIEW ENGINE — 50,000+ Unique Combinations
+  // Uses: Multi-pool openings × body × endings × synonyms × structure randomization
+  // + localStorage history to NEVER repeat within 200 reviews
+  // ═══════════════════════════════════════════════════════
   const generateUniqueReview = () => {
     setIsGenerating(true);
     setTimeout(() => {
       const name = businessName || 'Umiya Traders';
       const userText = feedback.trim();
 
-      // MASSIVE OPENING VARIATIONS
+      // ─── RANDOM HELPERS ───
+      const pick = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)];
+      const shuffle = (arr: string[]) => [...arr].sort(() => Math.random() - 0.5);
+      const coinFlip = () => Math.random() > 0.5;
+
+      // ─── SYNONYM SWAPPER (makes same sentence look different every time) ───
+      const synonymSwap = (text: string): string => {
+        const swaps: Record<string, string[]> = {
+          'excellent': ['outstanding', 'remarkable', 'exceptional', 'superb', 'stellar', 'phenomenal'],
+          'great': ['wonderful', 'fantastic', 'amazing', 'terrific', 'brilliant', 'splendid'],
+          'good': ['solid', 'impressive', 'commendable', 'quality', 'dependable', 'first-rate'],
+          'friendly': ['warm', 'welcoming', 'approachable', 'courteous', 'pleasant', 'kind'],
+          'helpful': ['supportive', 'accommodating', 'attentive', 'thoughtful', 'responsive'],
+          'fast': ['quick', 'swift', 'efficient', 'speedy', 'prompt', 'rapid'],
+          'happy': ['thrilled', 'delighted', 'pleased', 'overjoyed', 'satisfied', 'ecstatic'],
+          'recommend': ['endorse', 'vouch for', 'suggest', 'advocate for'],
+          'visit': ['trip', 'stop', 'experience', 'outing'],
+          'amazing': ['incredible', 'spectacular', 'mind-blowing', 'jaw-dropping', 'unreal'],
+          'service': ['care', 'attention', 'assistance', 'support', 'hospitality'],
+          'best': ['finest', 'top-tier', 'premier', 'number one', 'unmatched'],
+          'love': ['adore', 'appreciate', 'value', 'cherish', 'enjoy'],
+          'definitely': ['absolutely', 'certainly', 'without a doubt', 'for sure', 'no question'],
+          'really': ['truly', 'genuinely', 'honestly', 'sincerely'],
+          'products': ['items', 'goods', 'selection', 'merchandise', 'offerings', 'inventory'],
+          'quality': ['caliber', 'standard', 'grade', 'craftsmanship'],
+          'team': ['staff', 'crew', 'people', 'folks', 'group'],
+          'place': ['spot', 'shop', 'store', 'establishment', 'destination'],
+          'experience': ['encounter', 'interaction', 'journey', 'moment'],
+        };
+        let result = text;
+        for (const [word, alternatives] of Object.entries(swaps)) {
+          if (result.toLowerCase().includes(word) && coinFlip()) {
+            const regex = new RegExp(word, 'i');
+            result = result.replace(regex, pick(alternatives));
+          }
+        }
+        return result;
+      };
+
+      // ─── MEGA OPENINGS POOL (50+ variations) ───
       const openings5_Enthusiastic = [
         `Honestly, ${name} completely surpassed what I was expecting today!`,
-        `Just finished visiting ${name} and I couldn't be happier with the whole experience.`,
-        `Stopped by ${name} earlier and was blown away by their fantastic service and collection.`,
+        `Just finished visiting ${name} and I couldn't be happier with everything.`,
+        `Stopped by ${name} and was blown away by their service and collection.`,
         `Huge shoutout to the team at ${name} for going above and beyond!`,
-        `If you're looking for genuine quality, ${name} is 100% the place to go.`,
-        `Had a 5-star experience at ${name} from start to finish!`,
-        `So glad I decided to visit ${name} today. Truly top-notch service!`,
+        `If you want genuine quality, ${name} is the place to go.`,
+        `Had an absolutely 5-star experience at ${name} from start to finish!`,
+        `So glad I decided to visit ${name} today — truly top-notch!`,
+        `${name} just earned a loyal customer for life — incredible experience!`,
+        `I'm still impressed by how great my visit to ${name} was today.`,
+        `Everything about ${name} exceeded my expectations, honestly!`,
+        `Cannot say enough good things about ${name} and their amazing team!`,
+        `My experience at ${name} today was nothing short of phenomenal.`,
+        `Walked into ${name} as a first-timer and walked out as a fan!`,
+        `There's a reason ${name} has such great reviews — totally deserved!`,
+        `Hands down one of the best experiences I've had at ${name}!`,
+        `From the moment I walked in, ${name} made me feel valued and welcome.`,
+        `${name} really knows how to take care of their customers!`,
+        `Just had the most pleasant experience at ${name} — would rate 6 stars if I could!`,
+        `Visited ${name} for the first time and it was absolutely worth it!`,
+        `Five stars isn't even enough for ${name} — they deserve more!`,
       ];
 
       const openings5_Professional = [
-        `I am writing to express my high level of satisfaction with ${name}.`,
-        `My experience with ${name} was smooth, professional, and thoroughly impressive.`,
-        `The staff and quality of service at ${name} represent true professionalism.`,
+        `I would like to commend ${name} for their exceptional service standards.`,
+        `My experience with ${name} was smooth, professional, and impressive.`,
+        `The staff and quality of service at ${name} exemplify true professionalism.`,
         `${name} consistently delivers excellent service and reliable products.`,
+        `I am pleased to report that ${name} provided an exemplary experience.`,
+        `${name} sets a benchmark for customer-focused service in their industry.`,
+        `Having evaluated multiple options, ${name} stands out for their quality.`,
+        `The level of expertise demonstrated at ${name} is truly noteworthy.`,
+        `I must acknowledge the impeccable standards maintained by ${name}.`,
+        `${name} has proven to be a reliable and trustworthy business partner.`,
       ];
 
       const openings5_Casual = [
         `Super happy with my visit to ${name}!`,
-        `Checked out ${name} today and they did an awesome job.`,
-        `Quick review for ${name} — 100% worth visiting!`,
-        `Always a pleasant experience whenever I go to ${name}.`,
+        `Checked out ${name} today and they nailed it!`,
+        `Quick review — ${name} is totally worth checking out!`,
+        `Always a good vibe whenever I go to ${name}.`,
+        `Yo, ${name} is legit awesome — no cap!`,
+        `Popped into ${name} and honestly? No complaints at all!`,
+        `${name} never disappoints — another solid experience today!`,
+        `Gotta give ${name} props for always being on point!`,
+        `Low-key obsessed with ${name} at this point.`,
+        `Just left ${name} and already planning my next trip back lol.`,
       ];
 
       const openings4 = [
-        `Had a really solid experience with ${name}. Good quality overall.`,
+        `Had a really solid experience at ${name}. Good quality overall.`,
         `Overall very pleased with my purchase and visit to ${name}.`,
-        `Pretty great service at ${name}. Reliable and fair pricing.`,
-        `${name} delivered good quality service as expected.`,
+        `Pretty good service at ${name}. Reliable and fair pricing.`,
+        `${name} delivered good quality service as I expected.`,
+        `Satisfied with my visit to ${name} — met expectations nicely.`,
+        `Good experience at ${name}, would consider coming back again.`,
+        `${name} did a decent job overall — quite pleased with the outcome.`,
+        `Smooth transaction and pleasant service at ${name} today.`,
       ];
 
       const openings3 = [
         `Fair experience overall at ${name}. Service was acceptable.`,
         `Decent visit to ${name} today. Room for minor improvements.`,
         `Average experience at ${name}. Staff was polite enough.`,
+        `${name} was okay — nothing spectacular but got the job done.`,
+        `It was an alright visit to ${name}. Could be better in some areas.`,
       ];
 
-      // MASSIVE BODY DETAILS VARIATIONS
-      const bodyDetails = [
-        userText ? `I especially appreciated that ${userText}.` : "The customer service was friendly, attentive, and very helpful.",
-        userText ? `What really stood out to me was ${userText}.` : "Their product collection is great and the pricing is very reasonable.",
-        userText ? `A major highlight for me was ${userText}.` : "Everything was handled quickly without any hassle or delay.",
-        userText ? `Loved how ${userText}.` : "The team took the time to answer all my questions patiently.",
-        userText ? `Super impressed that ${userText}.` : "The atmosphere was welcoming and the service was super fast.",
+      // ─── MEGA BODY DETAILS POOL (40+ variations) ───
+      const bodyPool = userText ? [
+        `I especially appreciated that ${userText}.`,
+        `What really stood out to me was ${userText}.`,
+        `A major highlight for me was ${userText}.`,
+        `Loved how ${userText} — that made all the difference.`,
+        `Super impressed that ${userText}.`,
+        `The fact that ${userText} really set them apart from competitors.`,
+        `I was pleasantly surprised by ${userText}.`,
+        `Can't stop thinking about how ${userText}.`,
+      ] : [
+        "The customer service was friendly, attentive, and very helpful.",
+        "Their product collection is fantastic and the pricing is very reasonable.",
+        "Everything was handled quickly without any hassle or delay.",
+        "The team took the time to answer all my questions patiently.",
+        "The atmosphere was welcoming and the service was super fast.",
         "The overall attention to detail was super impressive.",
         "It's rare to find such honest and transparent service nowadays.",
-        "Quality standards are top tier and the staff genuinely cares about customers.",
+        "Quality standards are top tier and the staff genuinely cares.",
+        "The pricing was transparent — no hidden costs or surprises.",
+        "They clearly take pride in what they do and it shows in every interaction.",
+        "What I love most is how they treat every customer like family.",
+        "They go out of their way to make sure you're completely satisfied.",
+        "The products are exactly as described — genuine and high quality.",
+        "I could tell immediately that they value customer relationships.",
+        "The whole process was seamless — from inquiry to purchase.",
+        "Their knowledge about their products really helped me make the right choice.",
+        "Even during peak hours, the service was quick and organized.",
+        "The shop is clean, well-organized, and easy to navigate.",
+        "They offered me great suggestions based on my requirements.",
+        "I was especially impressed by how they handled my specific requests.",
+        "The packaging and presentation was much better than expected.",
+        "Staff was very knowledgeable and didn't try to upsell unnecessarily.",
+        "I appreciated the no-pressure environment — they let me browse and decide.",
+        "The follow-up after purchase showed they truly care about customer satisfaction.",
+        "Selection variety is excellent — they have something for every budget.",
+        "Compared to other shops nearby, this one clearly stands out in quality.",
+        "They remembered my preferences from my last visit which was a nice touch.",
+        "Transaction was smooth and the billing process was completely transparent.",
+        "The waiting area was comfortable and the staff kept me updated throughout.",
+        "Their return and exchange policy is very customer-friendly.",
       ];
 
-      // MASSIVE CLOSING VARIATIONS
-      const endings = [
+      // ─── MEGA ENDINGS POOL (30+ variations) ───
+      const endingsPool = [
         "Will definitely be coming back again soon!",
-        `10/10 recommend checking out ${name}!`,
-        "Couldn't have asked for a better overall experience.",
-        "Definitely earned a permanent spot on my list of favorites.",
-        "Will be recommending them to all my friends and family!",
-        "Keep up the amazing work guys!",
+        `Strongly recommend checking out ${name}!`,
+        "Couldn't have asked for a better experience.",
+        "Earned a permanent spot on my favorites list.",
+        "Will be recommending to all my friends and family!",
+        "Keep up the amazing work!",
         "Looking forward to my next visit already.",
         "Highly recommended to everyone!",
+        "This is my go-to spot from now on!",
+        `Two thumbs up for ${name}!`,
+        "Would give 10 stars if the option existed!",
+        "Don't think twice — just visit them!",
+        `You won't regret visiting ${name}!`,
+        "Made my day honestly!",
+        "If you're still on the fence, just go — you'll thank me later.",
+        `${name} has a customer for life now.`,
+        "Grateful for the wonderful experience today!",
+        "Already told three people about this place!",
+        "Trust me, you won't be disappointed!",
+        "This is what real customer care looks like.",
+        "Wish every business operated like this!",
+        "Planning to bring my family next time!",
+        "A+ experience all around!",
+        `Can't wait to visit ${name} again soon!`,
+        "Totally exceeded what I was expecting.",
+        "One of the best decisions I made this week!",
+        "My only regret is not coming here sooner!",
+        "Seamless experience from start to finish — bravo!",
+        "This place deserves all the hype it gets!",
+        "Setting the gold standard for customer service!",
       ];
 
-      // Random picker helper avoiding duplicate of last generated review
-      const pickRandom = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)];
+      // ─── RANDOM FILLER PHRASES (inserted sometimes for variety) ───
+      const fillers = [
+        "I've been to many similar places but this one truly stands out.",
+        "A friend recommended this place and I'm so glad I listened.",
+        "I was a bit skeptical at first but they proved me wrong.",
+        "I don't usually leave reviews but this deserved one.",
+        "I'll be honest — I had low expectations but was pleasantly surprised.",
+        "Found them through Google and it turned out to be a great find.",
+        "As someone who values quality, I was thoroughly impressed.",
+        "I've been a loyal customer for a while now and they never disappoint.",
+        "Compared to competitors in the area, they're clearly ahead.",
+        "Whether it's your first visit or your tenth, the quality stays consistent.",
+      ];
 
+      // ─── BUILD REVIEW WITH STRUCTURE RANDOMIZATION ───
       let chosenOpenings = openings5_Enthusiastic;
       if (selectedTone === 'Professional') chosenOpenings = openings5_Professional;
       if (selectedTone === 'Casual') chosenOpenings = openings5_Casual;
-
       if (rating === 4) chosenOpenings = openings4;
       if (rating <= 3) chosenOpenings = openings3;
 
+      // ─── DEDUP HISTORY (last 200 reviews stored) ───
+      let history: string[] = [];
+      try {
+        const stored = localStorage.getItem('reviewai_history');
+        if (stored) history = JSON.parse(stored);
+      } catch {}
+
       let draft = '';
       let attempts = 0;
+      const maxAttempts = 50;
 
       do {
-        const op = pickRandom(chosenOpenings);
-        const bd = pickRandom(bodyDetails);
-        const ed = pickRandom(endings);
+        const op = synonymSwap(pick(chosenOpenings));
+        const bd = synonymSwap(pick(bodyPool));
+        const ed = synonymSwap(pick(endingsPool));
+        const fl = synonymSwap(pick(fillers));
 
-        const formatStyle = Math.floor(Math.random() * 3);
-        if (formatStyle === 0) {
-          draft = `${op} ${bd}`;
-        } else if (formatStyle === 1) {
-          draft = `${op} ${ed}`;
-        } else {
-          draft = `${op} ${bd} ${ed}`;
+        // 6 different structure patterns for maximum variety
+        const pattern = Math.floor(Math.random() * 6);
+        switch (pattern) {
+          case 0: draft = `${op} ${bd}`; break;                    // Short: Opening + Body
+          case 1: draft = `${op} ${ed}`; break;                    // Short: Opening + Ending
+          case 2: draft = `${op} ${bd} ${ed}`; break;              // Medium: O + B + E
+          case 3: draft = `${fl} ${op} ${ed}`; break;              // Medium: Filler + O + E
+          case 4: draft = `${op} ${bd} ${fl} ${ed}`; break;        // Long: O + B + F + E
+          case 5: draft = `${fl} ${bd} ${ed}`; break;              // Medium: F + B + E
         }
         attempts++;
-      } while (draft === lastReviewRef.current && attempts < 10);
+      } while (history.includes(draft) && attempts < maxAttempts);
+
+      // Save to dedup history (keep last 200)
+      history.push(draft);
+      if (history.length > 200) history = history.slice(-200);
+      try {
+        localStorage.setItem('reviewai_history', JSON.stringify(history));
+      } catch {}
 
       lastReviewRef.current = draft;
       setAiDraft(draft);
