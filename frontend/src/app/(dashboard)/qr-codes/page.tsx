@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { QRCodeSVG } from 'qrcode.react';
 import {
@@ -16,6 +16,7 @@ import {
   Plus,
   Trash2,
   ExternalLink,
+  Wifi,
 } from 'lucide-react';
 
 export default function QRCodeGeneratorPage() {
@@ -25,6 +26,18 @@ export default function QRCodeGeneratorPage() {
   const [selectedFrame, setSelectedFrame] = useState('badge'); // badge, minimal, standee, border
   const [embedLogo, setEmbedLogo] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [targetUrl, setTargetUrl] = useState('http://172.20.10.2:3000/r/umiya-traders');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname;
+      if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+        setTargetUrl(`${window.location.origin}/r/umiya-traders`);
+      } else {
+        setTargetUrl(`http://172.20.10.2:3000/r/umiya-traders`);
+      }
+    }
+  }, []);
 
   const existingQRs = [
     { id: '1', name: 'Main Counter Standee', scans: 1420, status: 'Active', created: '2026-07-20', type: 'Dynamic' },
@@ -33,7 +46,7 @@ export default function QRCodeGeneratorPage() {
   ];
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText('http://localhost:3000/r/umiya-traders');
+    navigator.clipboard.writeText(targetUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -80,6 +93,26 @@ export default function QRCodeGeneratorPage() {
                 placeholder="e.g. Counter Standee, Table #2"
                 className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-600"
               />
+            </div>
+
+            {/* Scannable Target URL Input */}
+            <div className="space-y-1.5 p-4 rounded-2xl bg-slate-950 border border-slate-800">
+              <label className="text-xs font-semibold text-slate-300 block flex items-center justify-between">
+                <span>Scannable Target URL (Mobile Accessible)</span>
+                <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+                  <Wifi className="w-3 h-3" /> Mobile Wi-Fi/LAN Ready
+                </span>
+              </label>
+              <input
+                type="text"
+                value={targetUrl}
+                onChange={(e) => setTargetUrl(e.target.value)}
+                placeholder="http://172.20.10.2:3000/r/umiya-traders"
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 font-mono text-xs text-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-600"
+              />
+              <p className="text-[10px] text-slate-500 mt-1">
+                Note: Mobile phones on your Wi-Fi will open this exact URL when scanning the QR code!
+              </p>
             </div>
 
             {/* Color Pickers */}
@@ -184,7 +217,7 @@ export default function QRCodeGeneratorPage() {
               >
                 <div className="relative flex items-center justify-center">
                   <QRCodeSVG
-                    value="http://localhost:3000/r/umiya-traders"
+                    value={targetUrl}
                     size={176}
                     bgColor={bgColor}
                     fgColor={fgColor}
@@ -255,7 +288,7 @@ export default function QRCodeGeneratorPage() {
               <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col items-center justify-center text-center">
                 <div className="w-28 h-28 bg-white p-2 rounded-xl shadow-lg border border-slate-700 flex items-center justify-center">
                   <QRCodeSVG
-                    value="http://localhost:3000/r/umiya-traders"
+                    value={targetUrl}
                     size={96}
                     bgColor="#FFFFFF"
                     fgColor="#0F172A"
@@ -274,11 +307,11 @@ export default function QRCodeGeneratorPage() {
                 <button className="py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-[11px] font-semibold text-slate-200 flex items-center justify-center gap-1 transition-colors cursor-pointer">
                   <Download className="w-3 h-3" /> PNG
                 </button>
-                <Link href="/r/umiya-traders" target="_blank" className="w-full">
+                <a href={targetUrl} target="_blank" className="w-full">
                   <button className="w-full py-2 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-[11px] font-semibold text-blue-300 flex items-center justify-center gap-1 transition-colors cursor-pointer">
                     <ExternalLink className="w-3 h-3" /> Test URL
                   </button>
-                </Link>
+                </a>
               </div>
             </div>
           ))}

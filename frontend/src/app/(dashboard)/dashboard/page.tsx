@@ -204,7 +204,7 @@ export default function DashboardOverviewPage() {
             <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col items-center justify-center text-center space-y-3">
               <div className="w-32 h-32 bg-white p-2 rounded-xl shadow-lg border-2 border-blue-600 flex items-center justify-center">
                 <QRCodeSVG
-                  value="http://localhost:3000/r/umiya-traders"
+                  value="http://172.20.10.2:3000/r/umiya-traders"
                   size={112}
                   bgColor="#FFFFFF"
                   fgColor="#0F172A"
