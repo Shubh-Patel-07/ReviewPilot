@@ -34,6 +34,21 @@ export default function BusinessProfilePage() {
     }
   }, []);
 
+  const bannerRef = React.useRef<HTMLInputElement>(null);
+  const logoRef = React.useRef<HTMLInputElement>(null);
+
+  const handleBannerUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      window.alert('Banner selected: ' + e.target.files[0].name);
+    }
+  };
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      window.alert('Logo selected: ' + e.target.files[0].name);
+    }
+  };
+
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     if (typeof window !== 'undefined') {
@@ -73,7 +88,11 @@ export default function BusinessProfilePage() {
       <div className="card-stripe rounded-3xl border border-slate-800 overflow-hidden space-y-0">
         {/* Cover Banner */}
         <div className="h-40 bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 relative p-4 flex items-end justify-end">
-          <button className="px-3 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-900 text-xs font-semibold text-slate-200 backdrop-blur-md border border-slate-700/80 flex items-center gap-1.5 transition-colors">
+          <input type="file" ref={bannerRef} className="hidden" accept="image/*" onChange={handleBannerUpload} />
+          <button 
+            type="button"
+            onClick={() => bannerRef.current?.click()}
+            className="px-3 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-900 text-xs font-semibold text-slate-200 backdrop-blur-md border border-slate-700/80 flex items-center gap-1.5 transition-colors">
             <Camera className="w-3.5 h-3.5" /> Change Banner Cover
           </button>
         </div>
@@ -85,7 +104,10 @@ export default function BusinessProfilePage() {
               <div className="w-24 h-24 rounded-3xl bg-slate-900 border-4 border-[#0F172A] p-1 shadow-2xl flex items-center justify-center text-4xl">
                 ☕
               </div>
+              <input type="file" ref={logoRef} className="hidden" accept="image/*" onChange={handleLogoUpload} />
               <button
+                type="button"
+                onClick={() => logoRef.current?.click()}
                 className="absolute bottom-0 right-0 p-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white shadow-lg border-2 border-slate-900 transition-colors"
                 title="Upload Logo"
               >

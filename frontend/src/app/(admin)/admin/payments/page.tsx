@@ -10,6 +10,27 @@ export default function AdminPaymentsPage() {
     { id: 'tx_103', business: 'Grand Hotel & Spa', amount: '$149.00', provider: 'Stripe', status: 'Completed', date: '2026-08-03' },
   ];
 
+  const handleExportCSV = () => {
+    const headers = ['Tx ID', 'Business', 'Amount', 'Payment Provider', 'Date', 'Status'];
+    const rows = payments.map((p) => [
+      p.id,
+      `"${p.business.replace(/"/g, '""')}"`,
+      p.amount,
+      p.provider,
+      p.date,
+      p.status,
+    ]);
+    const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'payments_export.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="space-y-8 max-w-7xl mx-auto font-['Inter',sans-serif]">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-6">
@@ -25,7 +46,7 @@ export default function AdminPaymentsPage() {
           </p>
         </div>
 
-        <button className="px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-xs font-semibold flex items-center gap-2">
+        <button onClick={handleExportCSV} className="px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-xs font-semibold flex items-center gap-2 cursor-pointer hover:bg-slate-800 transition-colors">
           <Download className="w-3.5 h-3.5 text-blue-400" /> Export CSV
         </button>
       </div>

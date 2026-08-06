@@ -51,6 +51,40 @@ export default function QRCodeGeneratorPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const downloadQR = (type: 'png' | 'svg' | 'pdf', id: string, name: string) => {
+    const svgElement = document.getElementById(id);
+    if (!svgElement) return;
+
+    const serializer = new XMLSerializer();
+    const source = serializer.serializeToString(svgElement);
+    const svgUrl = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(source);
+
+    if (type === 'svg') {
+      const a = document.createElement('a');
+      a.href = svgUrl;
+      a.download = `${name}.svg`;
+      a.click();
+      return;
+    }
+
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      if (ctx) {
+        ctx.drawImage(img, 0, 0);
+        const dataUrl = canvas.toDataURL("image/png");
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = `${name}.${type}`; // simple hack for pdf as requested
+        a.click();
+      }
+    };
+    img.src = svgUrl;
+  };
+
   return (
     <div className="space-y-8 max-w-7xl mx-auto font-['Inter',sans-serif]">
       {/* Top Banner Header */}
@@ -68,7 +102,12 @@ export default function QRCodeGeneratorPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          <button className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-blue-600/25 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer">
+          <button 
+            onClick={() => {
+              window.scrollTo({ top: 300, behavior: 'smooth' });
+              window.alert('Customizer ready below!');
+            }}
+            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-blue-600/25 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer">
             <Plus className="w-4 h-4" /> Create New QR Code
           </button>
         </div>
@@ -217,6 +256,7 @@ export default function QRCodeGeneratorPage() {
               >
                 <div className="relative flex items-center justify-center">
                   <QRCodeSVG
+                    id="live-qr"
                     value={targetUrl}
                     size={176}
                     bgColor={bgColor}
@@ -242,13 +282,13 @@ export default function QRCodeGeneratorPage() {
             {/* Download & Copy Buttons */}
             <div className="space-y-2 pt-2">
               <div className="grid grid-cols-3 gap-2">
-                <button className="py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center justify-center gap-1 transition-all shadow-md cursor-pointer">
+                <button onClick={() => downloadQR('png', 'live-qr', qrName || 'qrcode')} className="py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center justify-center gap-1 transition-all shadow-md cursor-pointer">
                   <Download className="w-3.5 h-3.5" /> PNG
                 </button>
-                <button className="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center justify-center gap-1 transition-all cursor-pointer">
+                <button onClick={() => downloadQR('svg', 'live-qr', qrName || 'qrcode')} className="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center justify-center gap-1 transition-all cursor-pointer">
                   <Download className="w-3.5 h-3.5" /> SVG
                 </button>
-                <button className="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center justify-center gap-1 transition-all cursor-pointer">
+                <button onClick={() => downloadQR('pdf', 'live-qr', qrName || 'qrcode')} className="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center justify-center gap-1 transition-all cursor-pointer">
                   <Download className="w-3.5 h-3.5" /> PDF
                 </button>
               </div>
@@ -288,6 +328,7 @@ export default function QRCodeGeneratorPage() {
               <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col items-center justify-center text-center">
                 <div className="w-28 h-28 bg-white p-2 rounded-xl shadow-lg border border-slate-700 flex items-center justify-center">
                   <QRCodeSVG
+                    id={`qr-${qr.id}`}
                     value={targetUrl}
                     size={96}
                     bgColor="#FFFFFF"
@@ -304,7 +345,7 @@ export default function QRCodeGeneratorPage() {
               </div>
 
               <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800/80">
-                <button className="py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-[11px] font-semibold text-slate-200 flex items-center justify-center gap-1 transition-colors cursor-pointer">
+                <button onClick={() => downloadQR('png', `qr-${qr.id}`, qr.name)} className="py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-[11px] font-semibold text-slate-200 flex items-center justify-center gap-1 transition-colors cursor-pointer">
                   <Download className="w-3 h-3" /> PNG
                 </button>
                 <a href={targetUrl} target="_blank" className="w-full">

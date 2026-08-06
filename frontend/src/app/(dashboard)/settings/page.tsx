@@ -19,6 +19,17 @@ export default function SettingsPage() {
   const [emailAlerts, setEmailAlerts] = useState(true);
   const [weeklyReports, setWeeklyReports] = useState(true);
   const [isSaved, setIsSaved] = useState(false);
+  const [theme, setTheme] = useState('dark');
+  const [timezone, setTimezone] = useState('UTC');
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [isPasswordUpdated, setIsPasswordUpdated] = useState(false);
+
+  const handleUpdatePassword = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsPasswordUpdated(true);
+    setTimeout(() => setIsPasswordUpdated(false), 2000);
+  };
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,7 +103,7 @@ export default function SettingsPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-slate-300 block">Dashboard Theme</label>
-                <select className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs">
+                <select value={theme} onChange={(e) => setTheme(e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs">
                   <option value="dark">Dark Slate (Default)</option>
                   <option value="light">Light Mode</option>
                   <option value="system">System Preference</option>
@@ -100,7 +111,7 @@ export default function SettingsPage() {
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-slate-300 block">Default Timezone</label>
-                <select className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs">
+                <select value={timezone} onChange={(e) => setTimezone(e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs">
                   <option value="UTC">UTC (Coordinated Universal Time)</option>
                   <option value="EST">Eastern Standard Time (US)</option>
                   <option value="PST">Pacific Standard Time (US)</option>
@@ -201,6 +212,8 @@ export default function SettingsPage() {
                 <label className="text-xs font-semibold text-slate-300 block">Current Password</label>
                 <input
                   type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
                   placeholder="••••••••"
                   className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs"
                 />
@@ -209,10 +222,19 @@ export default function SettingsPage() {
                 <label className="text-xs font-semibold text-slate-300 block">New Password</label>
                 <input
                   type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="At least 8 characters"
                   className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs"
                 />
               </div>
+              <button
+                onClick={handleUpdatePassword}
+                className="mt-4 px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold flex items-center gap-2 transition-all cursor-pointer"
+              >
+                {isPasswordUpdated ? <Check className="w-4 h-4 text-emerald-300" /> : <Save className="w-4 h-4" />}
+                {isPasswordUpdated ? 'Password Updated!' : 'Update Password'}
+              </button>
             </div>
           </div>
         )}

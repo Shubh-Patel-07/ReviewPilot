@@ -389,9 +389,9 @@ export default function LandingPage() {
           <span>&bull; &copy; 2026 ReviewAI Inc. All rights reserved.</span>
         </div>
         <div className="flex gap-6">
-          <a href="#" className="hover:text-slate-300">Privacy Policy</a>
-          <a href="#" className="hover:text-slate-300">Terms of Service</a>
-          <a href="#" className="hover:text-slate-300">Contact Support</a>
+          <a href="/privacy" className="hover:text-slate-300">Privacy Policy</a>
+          <a href="/terms" className="hover:text-slate-300">Terms of Service</a>
+          <a href="mailto:support@reviewai.com" className="hover:text-slate-300">Contact Support</a>
         </div>
       </footer>
     </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import {
   QrCode,
@@ -19,6 +19,8 @@ import {
 import Link from 'next/link';
 
 export default function DashboardOverviewPage() {
+  const [timeframe, setTimeframe] = useState('7');
+
   const metrics = [
     {
       title: 'Total QR Scans',
@@ -129,7 +131,7 @@ export default function DashboardOverviewPage() {
               </h2>
               <p className="text-xs text-slate-400 mt-0.5">Scans vs Generated AI Review Drafts (Last 7 Days)</p>
             </div>
-            <select className="bg-slate-950 border border-slate-800 text-xs text-slate-300 rounded-xl px-3 py-1.5 focus:outline-none">
+            <select value={timeframe} onChange={(e) => setTimeframe(e.target.value)} className="bg-slate-950 border border-slate-800 text-xs text-slate-300 rounded-xl px-3 py-1.5 focus:outline-none">
               <option value="7">Last 7 Days</option>
               <option value="30">Last 30 Days</option>
             </select>

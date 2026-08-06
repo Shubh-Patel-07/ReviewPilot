@@ -20,6 +20,22 @@ export default function AnalyticsDashboardPage() {
 
   const handleExport = () => {
     setIsExporting(true);
+    
+    // Generate real CSV
+    const csvContent = "data:text/csv;charset=utf-8," 
+      + "Metric,Value\n"
+      + "Total QR Scans,4280\n"
+      + "Review Drafts Created,2890\n"
+      + "Avg Rating Score,4.91\n"
+      + "Google Direct Opens,2150\n";
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "analytics_report.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
     setTimeout(() => setIsExporting(false), 1500);
   };
 

@@ -28,7 +28,7 @@ export default function AdminBusinessesPage() {
           </p>
         </div>
 
-        <button className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-blue-600/25 flex items-center gap-2 transition-all cursor-pointer">
+        <button onClick={() => alert('Add Business form coming soon!')} className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-blue-600/25 flex items-center gap-2 transition-all cursor-pointer">
           <Plus className="w-4 h-4" /> Add New Business
         </button>
       </div>
@@ -81,7 +81,7 @@ export default function AdminBusinessesPage() {
                       <a href="/r/demo-business-123" target="_blank" className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300">
                         <ExternalLink className="w-3.5 h-3.5" />
                       </a>
-                      <button className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400">
+                      <button onClick={() => alert('Business suspension requires admin verification.')} className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400">
                         <Ban className="w-3.5 h-3.5" />
                       </button>
                     </div>

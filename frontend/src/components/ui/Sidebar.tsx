@@ -20,7 +20,7 @@ import {
 const menuItems = [
   { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
   { name: 'QR Code System', href: '/qr-codes', icon: QrCode },
-  { name: 'Review Drafts', href: '/reviews', icon: MessageSquare },
+  { name: 'Review Drafts', href: '/qr-codes', icon: MessageSquare },
   { name: 'Analytics', href: '/analytics', icon: BarChart3 },
   { name: 'Business Profile', href: '/profile', icon: Building2 },
   { name: 'Billing & Plan', href: '/billing', icon: CreditCard },

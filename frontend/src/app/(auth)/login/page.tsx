@@ -14,6 +14,7 @@ export default function LoginPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    alert('Login successful! Redirecting to dashboard...');
     setTimeout(() => {
       window.location.href = '/dashboard';
     }, 800);
@@ -149,7 +150,7 @@ export default function LoginPage() {
             <div>
               <div className="flex justify-between items-center mb-1.5">
                 <label className="text-xs font-semibold text-slate-300">Password</label>
-                <a href="#" className="text-xs text-blue-400 hover:text-blue-300 font-medium">
+                <a href="#" onClick={(e) => { e.preventDefault(); alert('Password reset email feature coming soon!'); }} className="text-xs text-blue-400 hover:text-blue-300 font-medium">
                   Forgot Password?
                 </a>
               </div>

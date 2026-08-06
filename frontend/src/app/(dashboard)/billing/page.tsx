@@ -131,6 +131,7 @@ export default function SubscriptionBillingPage() {
             </div>
 
             <button
+              onClick={() => window.alert('Stripe payment integration coming soon! Contact us to upgrade.')}
               className={`w-full py-3 rounded-xl font-bold text-xs transition-all cursor-pointer ${
                 plan.id === 'pro'
                   ? 'bg-emerald-600 text-white hover:bg-emerald-500 shadow-lg shadow-emerald-600/20'
