@@ -31,27 +31,20 @@ export default function CustomerQRReviewPage() {
   const [selectedLanguage, setSelectedLanguage] = useState<string>('English');
   const [selectedTone, setSelectedTone] = useState<string>('Enthusiastic');
 
-  // Exact Clean Google Maps Link for Umiya Traders
-  const UMIYA_CLEAN_LINK = 'https://www.google.com/maps/place/Umiya+traders/@23.8500156,72.1210274,17z/data=!4m15!1m8!3m7!1s0x395c870e52c628c7:0xc460ce380999c40d!2sUmiya+traders!8m2!3d23.8500156!4d72.1210274!10e1!16s%2Fg%2F11ptz85sym!3m5!1s0x395c870e52c628c7:0xc460ce380999c40d!8m2!3d23.8500156!4d72.1210274!16s%2Fg%2F11ptz85sym';
+  // OFFICIAL Direct Google Write-a-Review Deep Link for Umiya Traders
+  // `#lrd=...,3` forces Google Search to directly open the "Write a Review" modal dialog box!
+  const UMIYA_DIRECT_WRITE_REVIEW_LINK = 'https://www.google.com/search?q=Umiya+traders#lrd=0x395c870e52c628c7:0xc460ce380999c40d,3';
 
-  const [googleReviewUrl, setGoogleReviewUrl] = useState<string>(UMIYA_CLEAN_LINK);
-
-  const getCleanUrl = (rawUrl: string) => {
-    let url = rawUrl.trim();
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      url = `https://${url}`;
-    }
-    return url;
-  };
+  const [googleReviewUrl, setGoogleReviewUrl] = useState<string>(UMIYA_DIRECT_WRITE_REVIEW_LINK);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedUrl = localStorage.getItem('google_review_url');
-      if (savedUrl && !savedUrl.includes('action=write-review')) {
-        setGoogleReviewUrl(getCleanUrl(savedUrl));
+      if (savedUrl && (savedUrl.includes('#lrd=') || savedUrl.includes('writereview'))) {
+        setGoogleReviewUrl(savedUrl);
       } else {
-        localStorage.setItem('google_review_url', UMIYA_CLEAN_LINK);
-        setGoogleReviewUrl(UMIYA_CLEAN_LINK);
+        localStorage.setItem('google_review_url', UMIYA_DIRECT_WRITE_REVIEW_LINK);
+        setGoogleReviewUrl(UMIYA_DIRECT_WRITE_REVIEW_LINK);
       }
 
       const savedName = localStorage.getItem('business_name');
@@ -129,11 +122,8 @@ export default function CustomerQRReviewPage() {
     // 2. Show floating action guidance bar
     setShowFloatingActionBar(true);
 
-    // 3. Format clean URL
-    const targetUrl = getCleanUrl(googleReviewUrl);
-
-    // 4. Open Google Maps link in new tab
-    window.open(targetUrl, '_blank');
+    // 3. Open official Direct Write-a-Review popup URL in new tab
+    window.open(googleReviewUrl, '_blank');
   };
 
   return (
@@ -311,7 +301,7 @@ export default function CustomerQRReviewPage() {
               </p>
             )}
 
-            {/* Action Buttons: Copy & Open Direct Google Review */}
+            {/* Action Buttons: Copy & Open Direct Google Review Popup */}
             <div className="grid grid-cols-2 gap-3 pt-1">
               <button
                 onClick={handleCopy}
@@ -337,7 +327,7 @@ export default function CustomerQRReviewPage() {
         <div className="fixed bottom-6 right-6 z-50 max-w-sm w-full card-stripe-glow rounded-3xl p-5 border border-emerald-500/40 shadow-2xl space-y-3 animate-in slide-in-from-bottom duration-300">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
-              <Check className="w-4 h-4" /> Review Copied! Umiya Traders Page Opened
+              <Check className="w-4 h-4" /> Review Copied! Review Popup Opened
             </span>
             <button
               onClick={() => setShowFloatingActionBar(false)}
@@ -349,7 +339,7 @@ export default function CustomerQRReviewPage() {
 
           <div className="p-3 rounded-2xl bg-slate-950/90 border border-slate-800 text-xs space-y-2">
             <div className="flex items-center justify-between text-[11px] text-slate-400">
-              <span>On Umiya Traders Google Page:</span>
+              <span>On Umiya Traders Review Popup:</span>
               <span className="text-amber-400 font-bold">⭐ Tap 5th Star</span>
             </div>
             <div className="flex items-center gap-2">

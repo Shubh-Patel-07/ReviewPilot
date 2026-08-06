@@ -17,7 +17,7 @@ import {
 export default function BusinessProfilePage() {
   const [businessName, setBusinessName] = useState('Umiya Traders');
   const [category, setCategory] = useState('Retail & Wholesale');
-  const [googleUrl, setGoogleUrl] = useState('https://www.google.com/maps/place/Umiya+traders/@23.8500156,72.1210274,17z/data=!4m15!1m8!3m7!1s0x395c870e52c628c7:0xc460ce380999c40d!2sUmiya+traders!8m2!3d23.8500156!4d72.1210274!10e1!16s%2Fg%2F11ptz85sym!3m5!1s0x395c870e52c628c7:0xc460ce380999c40d!8m2!3d23.8500156!4d72.1210274!16s%2Fg%2F11ptz85sym');
+  const [googleUrl, setGoogleUrl] = useState('https://www.google.com/search?q=Umiya+traders#lrd=0x395c870e52c628c7:0xc460ce380999c40d,3');
   const [website, setWebsite] = useState('https://aromaroastery.com');
   const [phone, setPhone] = useState('+1 (555) 234-5678');
   const [email, setEmail] = useState('contact@aromaroastery.com');
