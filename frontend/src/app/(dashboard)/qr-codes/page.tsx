@@ -26,16 +26,11 @@ export default function QRCodeGeneratorPage() {
   const [selectedFrame, setSelectedFrame] = useState('badge'); // badge, minimal, standee, border
   const [embedLogo, setEmbedLogo] = useState(true);
   const [copied, setCopied] = useState(false);
-  const [targetUrl, setTargetUrl] = useState('http://172.20.10.2:3000/r/umiya-traders');
+  const [targetUrl, setTargetUrl] = useState('/r/umiya-traders');
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const hostname = window.location.hostname;
-      if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
-        setTargetUrl(`${window.location.origin}/r/umiya-traders`);
-      } else {
-        setTargetUrl(`http://172.20.10.2:3000/r/umiya-traders`);
-      }
+      setTargetUrl(`${window.location.origin}/r/umiya-traders`);
     }
   }, []);
 
@@ -331,7 +326,7 @@ export default function QRCodeGeneratorPage() {
                 type="text"
                 value={targetUrl}
                 onChange={(e) => setTargetUrl(e.target.value)}
-                placeholder="http://172.20.10.2:3000/r/umiya-traders"
+                placeholder="https://yoursite.vercel.app/r/umiya-traders"
                 className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 font-mono text-xs text-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-600"
               />
               <p className="text-[10px] text-slate-500 mt-1">
