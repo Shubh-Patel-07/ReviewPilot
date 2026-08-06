@@ -51,38 +51,223 @@ export default function QRCodeGeneratorPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const downloadQR = (type: 'png' | 'svg' | 'pdf', id: string, name: string) => {
-    const svgElement = document.getElementById(id);
+  // ═══════════════════════════════════════════════════════════════
+  // PROFESSIONAL PRINT-READY QR POSTER GENERATOR
+  // Generates beautiful A5-sized standee/poster with:
+  //  - Gradient header with business name
+  //  - 5-star rating display
+  //  - High-res QR code centered
+  //  - "Scan Me" call-to-action
+  //  - Google Review branding footer
+  //  - Ready for direct printing at any print shop
+  // ═══════════════════════════════════════════════════════════════
+  const downloadPrintReady = (format: 'png' | 'svg' | 'pdf', qrSvgId: string, label: string) => {
+    const svgElement = document.getElementById(qrSvgId);
     if (!svgElement) return;
 
-    const serializer = new XMLSerializer();
-    const source = serializer.serializeToString(svgElement);
-    const svgUrl = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(source);
-
-    if (type === 'svg') {
+    // If SVG raw download requested
+    if (format === 'svg') {
+      const serializer = new XMLSerializer();
+      const source = serializer.serializeToString(svgElement);
+      const blob = new Blob([source], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = svgUrl;
-      a.download = `${name}.svg`;
+      a.href = url;
+      a.download = `${label}_QR.svg`;
       a.click();
+      URL.revokeObjectURL(url);
       return;
     }
 
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    const img = new Image();
-    img.onload = () => {
-      canvas.width = img.width;
-      canvas.height = img.height;
-      if (ctx) {
-        ctx.drawImage(img, 0, 0);
-        const dataUrl = canvas.toDataURL("image/png");
-        const a = document.createElement('a');
-        a.href = dataUrl;
-        a.download = `${name}.${type}`; // simple hack for pdf as requested
-        a.click();
+    // For PNG & PDF: Generate beautiful print-ready poster using Canvas
+    const serializer = new XMLSerializer();
+    const svgSource = serializer.serializeToString(svgElement);
+    const svgDataUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgSource);
+
+    const qrImg = new Image();
+    qrImg.onload = () => {
+      // A5 size at 300 DPI = 1748 × 2480 px (we'll use a scaled version)
+      const W = 1200;
+      const H = 1700;
+      const canvas = document.createElement('canvas');
+      canvas.width = W;
+      canvas.height = H;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      const bName = label || businessName || 'Umiya Traders';
+
+      // ── BACKGROUND ──
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+      bgGrad.addColorStop(0, '#0F172A');
+      bgGrad.addColorStop(0.4, '#1E293B');
+      bgGrad.addColorStop(1, '#0F172A');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // ── TOP GRADIENT BANNER ──
+      const bannerH = 320;
+      const bannerGrad = ctx.createLinearGradient(0, 0, W, bannerH);
+      bannerGrad.addColorStop(0, '#2563EB');
+      bannerGrad.addColorStop(0.5, '#4F46E5');
+      bannerGrad.addColorStop(1, '#7C3AED');
+      ctx.fillStyle = bannerGrad;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(W, 0);
+      ctx.lineTo(W, bannerH - 60);
+      ctx.quadraticCurveTo(W / 2, bannerH + 30, 0, bannerH - 60);
+      ctx.closePath();
+      ctx.fill();
+
+      // ── BUSINESS NAME ──
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 52px Inter, Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(bName, W / 2, 120);
+
+      // ── TAGLINE ──
+      ctx.fillStyle = 'rgba(255,255,255,0.8)';
+      ctx.font = '28px Inter, Arial, sans-serif';
+      ctx.fillText('Your Feedback Means Everything To Us!', W / 2, 175);
+
+      // ── 5 STARS ──
+      const starY = 220;
+      const starSize = 42;
+      const starSpacing = 55;
+      const starsStartX = W / 2 - (starSpacing * 2);
+      ctx.fillStyle = '#FBBF24';
+      ctx.font = `${starSize}px Arial`;
+      for (let i = 0; i < 5; i++) {
+        ctx.fillText('★', starsStartX + (i * starSpacing), starY);
       }
+
+      // ── QR CODE WHITE CARD ──
+      const cardW = 520;
+      const cardH = 520;
+      const cardX = (W - cardW) / 2;
+      const cardY = 380;
+
+      // Card shadow
+      ctx.shadowColor = 'rgba(37, 99, 235, 0.3)';
+      ctx.shadowBlur = 40;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 10;
+
+      // Rounded card
+      const r = 30;
+      ctx.fillStyle = '#FFFFFF';
+      ctx.beginPath();
+      ctx.moveTo(cardX + r, cardY);
+      ctx.lineTo(cardX + cardW - r, cardY);
+      ctx.quadraticCurveTo(cardX + cardW, cardY, cardX + cardW, cardY + r);
+      ctx.lineTo(cardX + cardW, cardY + cardH - r);
+      ctx.quadraticCurveTo(cardX + cardW, cardY + cardH, cardX + cardW - r, cardY + cardH);
+      ctx.lineTo(cardX + r, cardY + cardH);
+      ctx.quadraticCurveTo(cardX, cardY + cardH, cardX, cardY + cardH - r);
+      ctx.lineTo(cardX, cardY + r);
+      ctx.quadraticCurveTo(cardX, cardY, cardX + r, cardY);
+      ctx.closePath();
+      ctx.fill();
+
+      // Blue border around card
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = '#2563EB';
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      // Draw QR code inside white card
+      const qrSize = 420;
+      const qrX = cardX + (cardW - qrSize) / 2;
+      const qrY = cardY + (cardH - qrSize) / 2;
+      ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+
+      // ── SCAN ME BADGE ──
+      const badgeY = cardY + cardH + 40;
+      const badgeW = 300;
+      const badgeH = 65;
+      const badgeX = (W - badgeW) / 2;
+
+      const badgeGrad = ctx.createLinearGradient(badgeX, badgeY, badgeX + badgeW, badgeY);
+      badgeGrad.addColorStop(0, '#2563EB');
+      badgeGrad.addColorStop(1, '#4F46E5');
+      ctx.fillStyle = badgeGrad;
+
+      // Rounded badge
+      const br = 20;
+      ctx.beginPath();
+      ctx.moveTo(badgeX + br, badgeY);
+      ctx.lineTo(badgeX + badgeW - br, badgeY);
+      ctx.quadraticCurveTo(badgeX + badgeW, badgeY, badgeX + badgeW, badgeY + br);
+      ctx.lineTo(badgeX + badgeW, badgeY + badgeH - br);
+      ctx.quadraticCurveTo(badgeX + badgeW, badgeY + badgeH, badgeX + badgeW - br, badgeY + badgeH);
+      ctx.lineTo(badgeX + br, badgeY + badgeH);
+      ctx.quadraticCurveTo(badgeX, badgeY + badgeH, badgeX, badgeY + badgeH - br);
+      ctx.lineTo(badgeX, badgeY + br);
+      ctx.quadraticCurveTo(badgeX, badgeY, badgeX + br, badgeY);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 32px Inter, Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('📱  SCAN ME', W / 2, badgeY + 44);
+
+      // ── INSTRUCTIONS TEXT ──
+      const instrY = badgeY + badgeH + 60;
+      ctx.fillStyle = '#94A3B8';
+      ctx.font = '26px Inter, Arial, sans-serif';
+      ctx.fillText('1. Open your phone camera', W / 2, instrY);
+      ctx.fillText('2. Point at the QR code above', W / 2, instrY + 45);
+      ctx.fillText('3. Share your experience on Google', W / 2, instrY + 90);
+
+      // ── GOOGLE REVIEW BRANDING ──
+      const googleY = instrY + 160;
+      ctx.fillStyle = '#E2E8F0';
+      ctx.font = 'bold 30px Inter, Arial, sans-serif';
+      ctx.fillText('Leave us a Google Review', W / 2, googleY);
+
+      // Google colored dots
+      const dotY = googleY + 40;
+      const dotR = 8;
+      const dotColors = ['#4285F4', '#EA4335', '#FBBC04', '#34A853'];
+      const dotSpacing = 30;
+      const dotsStartX = W / 2 - ((dotColors.length - 1) * dotSpacing) / 2;
+      dotColors.forEach((color, i) => {
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(dotsStartX + (i * dotSpacing), dotY, dotR, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // ── FOOTER ──
+      ctx.fillStyle = '#475569';
+      ctx.font = '18px Inter, Arial, sans-serif';
+      ctx.fillText('Powered by ReviewAI', W / 2, H - 60);
+
+      // ── DECORATIVE CORNER ACCENTS ──
+      ctx.strokeStyle = 'rgba(37, 99, 235, 0.15)';
+      ctx.lineWidth = 3;
+      // Top-left
+      ctx.beginPath(); ctx.moveTo(30, 80); ctx.lineTo(30, 30); ctx.lineTo(80, 30); ctx.stroke();
+      // Top-right
+      ctx.beginPath(); ctx.moveTo(W - 30, 80); ctx.lineTo(W - 30, 30); ctx.lineTo(W - 80, 30); ctx.stroke();
+      // Bottom-left
+      ctx.beginPath(); ctx.moveTo(30, H - 80); ctx.lineTo(30, H - 30); ctx.lineTo(80, H - 30); ctx.stroke();
+      // Bottom-right
+      ctx.beginPath(); ctx.moveTo(W - 30, H - 80); ctx.lineTo(W - 30, H - 30); ctx.lineTo(W - 80, H - 30); ctx.stroke();
+
+      // ── DOWNLOAD ──
+      const dataUrl = canvas.toDataURL('image/png', 1.0);
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = `${bName}_QR_Poster.${format === 'pdf' ? 'png' : 'png'}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     };
-    img.src = svgUrl;
+    qrImg.src = svgDataUrl;
   };
 
   return (
@@ -282,13 +467,13 @@ export default function QRCodeGeneratorPage() {
             {/* Download & Copy Buttons */}
             <div className="space-y-2 pt-2">
               <div className="grid grid-cols-3 gap-2">
-                <button onClick={() => downloadQR('png', 'live-qr', qrName || 'qrcode')} className="py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center justify-center gap-1 transition-all shadow-md cursor-pointer">
+                <button onClick={() => downloadPrintReady('png', 'live-qr', qrName || 'qrcode')} className="py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center justify-center gap-1 transition-all shadow-md cursor-pointer">
                   <Download className="w-3.5 h-3.5" /> PNG
                 </button>
-                <button onClick={() => downloadQR('svg', 'live-qr', qrName || 'qrcode')} className="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center justify-center gap-1 transition-all cursor-pointer">
+                <button onClick={() => downloadPrintReady('svg', 'live-qr', qrName || 'qrcode')} className="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center justify-center gap-1 transition-all cursor-pointer">
                   <Download className="w-3.5 h-3.5" /> SVG
                 </button>
-                <button onClick={() => downloadQR('pdf', 'live-qr', qrName || 'qrcode')} className="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center justify-center gap-1 transition-all cursor-pointer">
+                <button onClick={() => downloadPrintReady('pdf', 'live-qr', qrName || 'qrcode')} className="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center justify-center gap-1 transition-all cursor-pointer">
                   <Download className="w-3.5 h-3.5" /> PDF
                 </button>
               </div>
@@ -345,7 +530,7 @@ export default function QRCodeGeneratorPage() {
               </div>
 
               <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800/80">
-                <button onClick={() => downloadQR('png', `qr-${qr.id}`, qr.name)} className="py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-[11px] font-semibold text-slate-200 flex items-center justify-center gap-1 transition-colors cursor-pointer">
+                <button onClick={() => downloadPrintReady('png', `qr-${qr.id}`, qr.name)} className="py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-[11px] font-semibold text-slate-200 flex items-center justify-center gap-1 transition-colors cursor-pointer">
                   <Download className="w-3 h-3" /> PNG
                 </button>
                 <a href={targetUrl} target="_blank" className="w-full">
